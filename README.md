@@ -1,4 +1,4 @@
-<img src="https://raw.github.com/slagyr/iOSGlossyButton/master/preview.png" alt="butcher logo" title="Glossy Buttons" align="right"/>
+<img src="" alt="butcher logo" title="Butcher" align="right"/>
 # Butcher
 
 ...
