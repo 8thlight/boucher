@@ -1,6 +1,6 @@
 require 'butcher/env'
 require 'butcher/classes'
-require 'butcher/nagios'
+require 'butcher/io'
 require 'fog'
 require 'retryable'
 
@@ -28,7 +28,9 @@ module Butcher
       command_arg = "\"#{command}\""
     end
 
-    Kernel.system "#{ssh_command} #{Butcher::Config[:username]}@#{server.dns_name} #{command_arg}"
+    command = "#{ssh_command} #{Butcher::Config[:username]}@#{server.dns_name} #{command_arg}"
+    verbose command
+    Kernel.system command
     raise "command failed with code #{$?.exitstatus}" unless $?.success?
   end
 

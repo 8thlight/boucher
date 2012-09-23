@@ -16,6 +16,12 @@ module Butcher
 
   end
 
+  def self.verbose(*args)
+    if ENV["VERBOSE"] != "false"
+      puts *args
+    end
+  end
+
   SERVER_TABLE_FORMAT = "%-12s  %-12s  %-10s  %-10s  %-10s  %-15s  %-15s %-10s\n"
 
   def self.print_server_table_header
