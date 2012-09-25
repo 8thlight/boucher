@@ -7,8 +7,8 @@ namespace :env do
   desc "Attaches elastic IPs"
   task :elastic_ips, [:env] do |t, args|
     Boucher.force_env!(args.env)
-    Boucher.each_required_server do |server, server_class|
-      Boucher.attach_elastic_ips(server_class, server)
+    Boucher.each_required_server do |server, meal|
+      Boucher.attach_elastic_ips(meal, server)
     end
   end
 
@@ -23,11 +23,11 @@ namespace :env do
   task :stop, [:env] do |t, args|
     Boucher.force_env!(args.env)
 
-    Boucher.each_required_server do |server, server_class|
+    Boucher.each_required_server do |server, meal|
       if server
         Boucher::Servers.stop(server.id)
       else
-        puts "No #{server_class} server found for #{Boucher::Config[:env]} environment."
+        puts "No #{meal} server found for #{Boucher::Config[:env]} environment."
       end
     end
   end
@@ -35,7 +35,7 @@ namespace :env do
   desc "Terminates all servers for the specified environment"
   task :terminate, [:env] do |t, args|
     Boucher.force_env!(args.env)
-    Boucher.each_required_server do |server, server_class|
+    Boucher.each_required_server do |server, meal|
       Boucher::Servers.terminate(server) if server
     end
   end

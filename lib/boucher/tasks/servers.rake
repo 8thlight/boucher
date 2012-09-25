@@ -1,7 +1,7 @@
 require 'boucher/compute'
 require 'boucher/env'
 require 'boucher/io'
-require 'boucher/classes'
+require 'boucher/meals'
 require 'boucher/provision'
 require 'boucher/servers'
 require 'boucher/volumes'
@@ -40,9 +40,9 @@ namespace :servers do
     server_listing("in the '#{args.env}' environment", Boucher::Servers.in_env(args.env))
   end
 
-  desc "List AWS servers in specified class"
-  task :of_class, [:klass] do |t, args|
-    server_listing("of class '#{args.klass}'", Boucher::Servers.of_class(args.klass))
+  desc "List AWS servers of the specified meal"
+  task :of_meal, [:meal] do |t, args|
+    server_listing("of meal '#{args.meal}'", Boucher::Servers.of_meal(args.meal))
   end
 
   desc "Terminates the specified server"
@@ -89,9 +89,9 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   task :download, [:server_id, :filepath] do |t, args|
     puts "Downloading #{args.filepath}"
 
-    server      = Boucher.compute.servers.get(args.server_id)
+    server = Boucher.compute.servers.get(args.server_id)
     remote_path = args.filepath
-    local_path  = File.expand_path(File.join("..", "..", File.basename(args.filepath)), __FILE__)
+    local_path = File.expand_path(File.join("..", "..", File.basename(args.filepath)), __FILE__)
 
     Boucher.download(server, remote_path, local_path)
   end
@@ -101,27 +101,24 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
     system "chmod 0600 *.pem"
   end
 
-  desc "Provision new server [#{Boucher.server_classes.keys.sort.join(', ')}]"
-  task :provision, [:klass] do |t, args|
-    class_map = Boucher.server_classes[args.klass.to_sym]
-    Boucher.provision(args.klass, class_map)
+  desc "Provision new server [#{Boucher.meals.keys.sort.join(', ')}]"
+  task :provision, [:meal] do |t, args|
+    meal_map = Boucher.meals[args.meal.to_sym]
+    Boucher.provision(args.meal, meal_map)
   end
 
-  desc "Provision new, or chef existing server of the specified class"
-  task :establish, [:klass] do |t, args|
+  desc "Provision new, or chef existing server of the specified meal"
+  task :establish, [:meal] do |t, args|
     Boucher.assert_env!
-    server = Boucher.find_server(args.klass, ENV['BUTCHER_ENV'])
-    Boucher.establish_server(server, args.klass)
+    server = Boucher.find_server(args.meal, ENV['BUTCHER_ENV'])
+    Boucher.establish_server(server, args.meal)
   end
 
-  namespace :chef do
-    meals.each do |s_class|
-      desc "Cook #{s_class} meal"
-      task s_class, [:server_id] do |t, args|
-        Boucher.assert_env!
-        server = Boucher.compute.servers.get(args.server_id)
-        Boucher.cook_meal(server, s_class)
-      end
-    end
+  desc "Cook the given meal on the given server"
+  task :chef, [:meal, :server_id] do |t, args|
+    Boucher.assert_env!
+    server = Boucher.compute.servers.get(args.server_id)
+    Boucher.cook_meal(server, args.meal)
   end
 end
+

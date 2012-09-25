@@ -13,7 +13,7 @@ describe "Boucher Provisioning" do
 
   describe "establish server" do
     it "provisions a server if one does not exist" do
-      Boucher.stub(:server_classes).and_return({:class_of_server => "server details"})
+      Boucher.stub(:meals).and_return({:class_of_server => "server details"})
       Boucher.should_receive(:provision).with("class_of_server", "server details")
 
       Boucher.establish_server nil, "class_of_server"
@@ -21,7 +21,7 @@ describe "Boucher Provisioning" do
 
     it "starts a server if it is stopped" do
       server = mock(:id => "the id", :state => "stopped")
-      Boucher.stub(:server_classes).and_return({:class_of_server => "server details"})
+      Boucher.stub(:meals).and_return({:class_of_server => "server details"})
       Boucher.should_receive(:change_server_state).with("the id", :start, "running")
       server.should_receive(:reload)
       Boucher.should_receive(:cook_meals_on_server).with("class_of_server", "server details", server)
@@ -32,7 +32,7 @@ describe "Boucher Provisioning" do
     it "attaches elastic IPs if the server was stopped" do
       Boucher::Config[:elastic_ips] = { "class_of_server" => "1.2.3.4" }
       server = mock(:id => "the id", :state => "stopped", :reload => nil)
-      Boucher.stub(:server_classes).and_return({:class_of_server => {:meals => []}})
+      Boucher.stub(:meals).and_return({:class_of_server => {:meals => []}})
       Boucher.stub(:change_server_state)
       Boucher.compute.should_receive(:associate_address).with(anything, "1.2.3.4")
 
@@ -41,7 +41,7 @@ describe "Boucher Provisioning" do
 
     it "cooks meals on server if it is up and running" do
       running_server = mock(:id => "the id", :state => "running")
-      Boucher.stub(:server_classes).and_return({:class_of_server => "server details"})
+      Boucher.stub(:meals).and_return({:class_of_server => "server details"})
       Boucher.should_receive(:cook_meals_on_server).with("class_of_server", "server details", running_server)
 
       Boucher.establish_server running_server, "class_of_server"
@@ -51,7 +51,7 @@ describe "Boucher Provisioning" do
   describe "provision" do
     it "provisions a server" do
       Boucher.stub!(:ssh)
-      Boucher.should_receive(:classify)
+      Boucher.should_receive(:setup_meal)
       Boucher.should_receive(:cook_meal).with(anything, "foo")
 
       Boucher.provision "foo", {:meals => ["foo"]}
@@ -59,7 +59,7 @@ describe "Boucher Provisioning" do
 
     it "provisions a server with Procs as meals" do
       Boucher.stub!(:ssh)
-      Boucher.should_receive(:classify)
+      Boucher.should_receive(:setup_meal)
       Boucher.should_receive(:cook_meal).with(anything, "foo")
 
       Boucher.provision "foo", {:meals => [lambda{"foo"}]}
@@ -68,7 +68,7 @@ describe "Boucher Provisioning" do
     it "provisions a server with elastic IP" do
       Boucher.stub!(:ssh)
       Boucher::Config[:elastic_ips] = { "foo" => "1.2.3.4" }
-      Boucher.should_receive(:classify)
+      Boucher.should_receive(:setup_meal)
       Boucher.compute.should_receive(:associate_address).with(anything, "1.2.3.4")
 
       Boucher.provision "foo", {:meals => []}

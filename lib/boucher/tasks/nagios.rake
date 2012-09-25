@@ -47,12 +47,12 @@ namespace :nagios do
   end
 
   desc "Adds a nagios host to be monitored by this machine"
-  task :add_host, [:name, :ip, :klass] do |t, args|
-    checks = Boucher::Nagios.checks_for(args.klass)
+  task :add_host, [:name, :ip, :meal] do |t, args|
+    checks = Boucher::Nagios.checks_for(args.meal)
     return if checks.empty?
 
     File.open(make_config_path(args.name), "w") do |file|
-      host_name = "#{args.klass}-#{args.name}"
+      host_name = "#{args.meal}-#{args.name}"
 
       file.puts host_entry(host_name, args.ip)
 

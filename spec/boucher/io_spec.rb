@@ -13,7 +13,7 @@ describe "Boucher IO" do
 
     output = $stdout.string
     puts "output: #{output}"
-    %w{ID Env Class Creator State Public IP Private IP}.each do |header|
+    %w{ID Env Meal Creator State Public IP Private IP}.each do |header|
       output.should include(header)
     end
   end
@@ -21,7 +21,7 @@ describe "Boucher IO" do
   it "prints a server" do
     server = OpenStruct.new(
             :id => "test_id",
-            :tags => {"Env" => "test_env", "Class" => "test_class", "Creator" => "Joe"},
+            :tags => {"Env" => "test_env", "Meal" => "test_class", "Creator" => "Joe"},
             :state => "test_state",
             :public_ip_address => "1.2.3.4")
 
@@ -36,22 +36,22 @@ describe "Boucher IO" do
     output.should include("1.2.3.4")
   end
 
-  it "prints servers ordered by Env, then Class" do
+  it "prints servers ordered by Env, then Meal" do
     server_1 = OpenStruct.new(
               :id => "test_id_1",
-              :tags => {"Env" => "test_env", "Class" => "test_class", "Creator" => "Joe"},
+              :tags => {"Env" => "test_env", "Meal" => "test_class", "Creator" => "Joe"},
               :state => "test_state",
               :public_ip_address => "1.2.3.4")
 
     server_2 = OpenStruct.new(
               :id => "test_id_2",
-              :tags => {"Env" => "better_env", "Class" => "test_class_1", "Creator" => "Joe"},
+              :tags => {"Env" => "better_env", "Meal" => "test_class_1", "Creator" => "Joe"},
               :state => "test_state",
               :public_ip_address => "1.2.3.5")
 
     server_3 = OpenStruct.new(
               :id => "test_id_3",
-              :tags => {"Env" => "better_env", "Class" => "test_class_2", "Creator" => "Joe"},
+              :tags => {"Env" => "better_env", "Meal" => "test_class_2", "Creator" => "Joe"},
               :state => "test_state",
               :public_ip_address => "1.2.3.6")
 

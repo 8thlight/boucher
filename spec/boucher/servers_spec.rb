@@ -5,10 +5,10 @@ require 'ostruct'
 describe "Boucher::Servers" do
 
   let(:remote_servers) {
-    [OpenStruct.new(:id => "s1", :tags => {"Env" => "test", "Class" => "foo"}, :state => "stopped"),
-     OpenStruct.new(:id => "s2", :tags => {"Env" => "test", "Class" => "bar"}, :state => "pending"),
-     OpenStruct.new(:id => "s3", :tags => {"Env" => "dev",  "Class" => "foo"}, :state => "terminated"),
-     OpenStruct.new(:id => "s4", :tags => {"Env" => "dev",  "Class" => "bar"}, :state => "running")]
+    [OpenStruct.new(:id => "s1", :tags => {"Env" => "test", "Meal" => "foo"}, :state => "stopped"),
+     OpenStruct.new(:id => "s2", :tags => {"Env" => "test", "Meal" => "bar"}, :state => "pending"),
+     OpenStruct.new(:id => "s3", :tags => {"Env" => "dev",  "Meal" => "foo"}, :state => "terminated"),
+     OpenStruct.new(:id => "s4", :tags => {"Env" => "dev",  "Meal" => "bar"}, :state => "running")]
   }
 
   before do
@@ -25,10 +25,10 @@ describe "Boucher::Servers" do
     Boucher::Servers.all.should == remote_servers
   end
 
-  it "finds classed servers" do
-    Boucher::Servers.of_class("blah").should == []
-    Boucher::Servers.of_class(:foo).map(&:id).should == ["s1", "s3"]
-    Boucher::Servers.of_class("bar").map(&:id).should == ["s2", "s4"]
+  it "finds mealed servers" do
+    Boucher::Servers.of_meal("blah").should == []
+    Boucher::Servers.of_meal(:foo).map(&:id).should == ["s1", "s3"]
+    Boucher::Servers.of_meal("bar").map(&:id).should == ["s2", "s4"]
   end
 
   it "finds with env servers" do
@@ -46,20 +46,20 @@ describe "Boucher::Servers" do
 
   it "finds the first matching server" do
     Boucher::Servers.find.id.should == "s1"
-    Boucher::Servers.find(:class => "foo").id.should == "s1"
-    Boucher::Servers.find(:class => "bar").id.should == "s2"
+    Boucher::Servers.find(:meal => "foo").id.should == "s1"
+    Boucher::Servers.find(:meal => "bar").id.should == "s2"
     Boucher::Servers.find(:env => "test").id.should == "s1"
     Boucher::Servers.find(:env => "dev").id.should == "s3"
-    Boucher::Servers.find(:class => "foo", :env => "test").id.should == "s1"
-    Boucher::Servers.find(:class => "foo", :env => "dev").id.should == "s3"
-    Boucher::Servers.find(:class => "bar", :env => "test").id.should == "s2"
-    Boucher::Servers.find(:class => "bar", :env => "dev").id.should == "s4"
-    expect { Boucher::Servers.find(:class => "blah", :env => "dev") }.to raise_error
-    expect { Boucher::Servers.find(:class => "foo", :env => "blah") }.to raise_error
+    Boucher::Servers.find(:meal => "foo", :env => "test").id.should == "s1"
+    Boucher::Servers.find(:meal => "foo", :env => "dev").id.should == "s3"
+    Boucher::Servers.find(:meal => "bar", :env => "test").id.should == "s2"
+    Boucher::Servers.find(:meal => "bar", :env => "dev").id.should == "s4"
+    expect { Boucher::Servers.find(:meal => "blah", :env => "dev") }.to raise_error
+    expect { Boucher::Servers.find(:meal => "foo", :env => "blah") }.to raise_error
   end
 
   it "raises an error if find returns no results" do
-    expect { Boucher::Servers.find(:class => "blah") }.to raise_error(Boucher::Servers::NotFound)
+    expect { Boucher::Servers.find(:meal => "blah") }.to raise_error(Boucher::Servers::NotFound)
   end
 
   it "gets a server based on current env when all the servers are running" do

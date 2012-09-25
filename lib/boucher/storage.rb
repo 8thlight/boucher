@@ -1,5 +1,5 @@
 require 'boucher/env'
-require 'boucher/classes'
+require 'boucher/meals'
 require 'fog'
 
 module Boucher

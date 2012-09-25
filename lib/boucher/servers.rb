@@ -16,7 +16,7 @@ module Boucher
         cultivate(@instance)
       end
 
-      %w{all of_class in_env in_state search find [] with_id}.each do |m|
+      %w{all of_meal in_env in_state search find [] with_id}.each do |m|
         module_eval "def #{m}(*args); instance.#{m}(*args); end"
       end
 
@@ -32,7 +32,7 @@ module Boucher
 
     def search(options={})
       servers = self
-      servers = servers.of_class(options[:class]) if options[:class]
+      servers = servers.of_meal(options[:meal]) if options[:meal]
       servers = servers.in_env(options[:env]) if options[:env]
       servers = servers.in_state(options[:state]) if options[:state]
       servers
@@ -55,8 +55,8 @@ module Boucher
       Servers.cultivate(self.find_all {|s| s.state == state.to_s })
     end
 
-    def of_class(klass)
-      Servers.cultivate(self.find_all {|s| s.tags["Class"] == klass.to_s })
+    def of_meal(meal)
+      Servers.cultivate(self.find_all {|s| s.tags["Meal"] == meal.to_s })
     end
 
     def self.start(server_id)
@@ -85,8 +85,8 @@ module Boucher
       Servers.cultivate(self.find_all {|s| s.id == server_id}).first
     end
 
-    def [](klass)
-      find(:env => Boucher::Config[:env], :class => klass, :state => "running")
+    def [](meal)
+      find(:env => Boucher::Config[:env], :meal => meal, :state => "running")
     end
   end
 end

@@ -1,7 +1,7 @@
 require 'boucher/compute'
 require 'boucher/env'
 require 'boucher/io'
-require 'boucher/classes'
+require 'boucher/meals'
 require 'boucher/provision'
 require 'boucher/servers'
 require 'boucher/volumes'

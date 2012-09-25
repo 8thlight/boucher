@@ -26,7 +26,7 @@ module Boucher
 
   def self.print_server_table_header
     puts
-    printf SERVER_TABLE_FORMAT, "ID", "Environment", "Class", "Creator", "State", "Public IP", "Private IP", "Inst. Size"
+    printf SERVER_TABLE_FORMAT, "ID", "Environment", "Meal", "Creator", "State", "Public IP", "Private IP", "Inst. Size"
     puts ("-" * 120)
   end
 
@@ -34,7 +34,7 @@ module Boucher
     printf SERVER_TABLE_FORMAT,
            server.id,
            (server.tags["Env"] || "???")[0...12],
-           (server.tags["Class"] || "???")[0...10],
+           (server.tags["Meal"] || "???")[0...10],
            (server.tags["Creator"] || "???")[0...10],
            server.state,
            server.public_ip_address,
@@ -45,7 +45,7 @@ module Boucher
   def self.print_servers(servers)
     print_server_table_header
     sorted_servers = servers.sort_by{|s| [s.tags["Env"] || "?",
-                                          s.tags["Class"] || "?"]}
+                                          s.tags["Meal"] || "?"]}
     sorted_servers.each do |server|
       print_server(server) if server
     end
