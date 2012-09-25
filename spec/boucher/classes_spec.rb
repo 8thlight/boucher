@@ -17,6 +17,8 @@ describe "Boucher Server Classes" do
   it "can classify base server" do
     some_class = {:class_name => "base",
                   :meals => ["base"]}
+    Boucher::Config[:default_instance_flavor_id] = 'm1.small'
+    Boucher::Config[:default_instance_groups] = ["SSH"]
     Boucher.classify(@server, some_class)
 
     @server.image_id.should == Boucher::Config[:base_image_id]
