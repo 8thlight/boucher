@@ -1,18 +1,18 @@
-require 'butcher/servers'
-require 'butcher/compute'
+require 'boucher/servers'
+require 'boucher/compute'
 
-module Butcher
+module Boucher
   module Nagios
     def self.remove_host(host)
       return if host.tags["Class"] == "nagios_server"
 
       monitors_for(host.tags["Env"]).each do |monitor|
         commands = [
-          "cd /home/#{Butcher::Config[:username]}/infrastructure",
+          "cd /home/#{Boucher::Config[:username]}/infrastructure",
           "sudo rake nagios:remove_host[#{host.id}]",
           "sudo /etc/init.d/nagios3 restart"
         ]
-        Butcher.ssh(monitor, commands.join(" && "))
+        Boucher.ssh(monitor, commands.join(" && "))
       end
     end
 
@@ -21,12 +21,12 @@ module Butcher
 
       monitors_for(host.tags["Env"]).each do |monitor|
         commands = [
-          "cd /home/#{Butcher::Config[:username]}/infrastructure",
+          "cd /home/#{Boucher::Config[:username]}/infrastructure",
           "sudo rake nagios:add_host[#{host.id},#{host.public_ip_address},#{host.tags["Class"]}]",
           "sudo /etc/init.d/nagios3 restart"
         ]
 
-        Butcher.ssh(monitor, commands.join(" && "))
+        Boucher.ssh(monitor, commands.join(" && "))
       end
     end
 
@@ -40,7 +40,7 @@ module Butcher
     private
 
     def self.monitors_for(env)
-      Butcher::Servers.all.select do |monitor|
+      Boucher::Servers.all.select do |monitor|
         monitor.tags["Class"] == "nagios_server" &&
         monitor.tags["Env"] == env &&
         monitor.dns_name

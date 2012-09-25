@@ -1,15 +1,15 @@
 require_relative "../spec_helper"
-require "butcher/io"
+require "boucher/io"
 require 'ostruct'
 
-describe "Butcher IO" do
+describe "Boucher IO" do
 
   before do
-    Butcher::IO.mock!
+    Boucher::IO.mock!
   end
 
   it "prints server table header" do
-    Butcher.print_server_table_header
+    Boucher.print_server_table_header
 
     output = $stdout.string
     puts "output: #{output}"
@@ -25,7 +25,7 @@ describe "Butcher IO" do
             :state => "test_state",
             :public_ip_address => "1.2.3.4")
 
-    Butcher.print_server server
+    Boucher.print_server server
     output = $stdout.string
 
     output.should include("test_id")
@@ -55,7 +55,7 @@ describe "Butcher IO" do
               :state => "test_state",
               :public_ip_address => "1.2.3.6")
 
-    Butcher.print_servers([server_1, server_2, server_3])
+    Boucher.print_servers([server_1, server_2, server_3])
     output = $stdout.string
 
     lines = output.split("\n")

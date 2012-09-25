@@ -1,14 +1,14 @@
-require 'butcher/compute'
+require 'boucher/compute'
 
-module Butcher
+module Boucher
   def self.destroy_volume(volume_id)
-    volume = Butcher::Volumes.with_id(volume_id)
+    volume = Boucher::Volumes.with_id(volume_id)
     Volumes.destroy(volume)
   end
 
   module Volumes
     def self.all
-      @volumes ||= Butcher.compute.volumes
+      @volumes ||= Boucher.compute.volumes
     end
 
     def self.destroy(volumes)
@@ -23,9 +23,9 @@ module Butcher
     end
 
     def self.create(zone, snapshot, device)
-      response  = Butcher.compute.create_volume(zone, snapshot.volume_size.to_i, snapshot.id)
+      response  = Boucher.compute.create_volume(zone, snapshot.volume_size.to_i, snapshot.id)
       volume_id = response.body["volumeId"]
-      volume    = Butcher.compute.volumes.get(volume_id)
+      volume    = Boucher.compute.volumes.get(volume_id)
 
       volume.wait_for { ready? }
       volume.device = device
@@ -34,7 +34,7 @@ module Butcher
 
     def self.attach(volumes, server)
       Array(volumes).each do |volume|
-        Butcher.compute.attach_volume(server.id, volume.id, volume.device)
+        Boucher.compute.attach_volume(server.id, volume.id, volume.device)
       end
     end
   end

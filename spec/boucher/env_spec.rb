@@ -12,14 +12,14 @@ describe "Environment" do
 
     it "defaults to :dev" do
       ENV.delete('BUTCHER_ENV')
-      #load File.expand_path(File.dirname(__FILE__) + "/../../lib/butcher/env.rb")
-      Butcher::env_name.should == :dev
+      #load File.expand_path(File.dirname(__FILE__) + "/../../lib/boucher/env.rb")
+      Boucher::env_name.should == :dev
     end
 
     it "can be set via an environment variable" do
       ENV['BUTCHER_ENV'] = "ci"
-      load File.expand_path(File.dirname(__FILE__) + "/../../lib/butcher/env.rb")
-      Butcher::env_name.should == "ci"
+      load File.expand_path(File.dirname(__FILE__) + "/../../lib/boucher/env.rb")
+      Boucher::env_name.should == "ci"
     end
   end
 
@@ -34,14 +34,14 @@ describe "Environment" do
     end
 
     it "defaults to master" do
-      Butcher.force_env!(:dev)
-      Butcher::Config[:branch].should == "master"
+      Boucher.force_env!(:dev)
+      Boucher::Config[:branch].should == "master"
     end
 
     it "can be set via an environment variable" do
       ENV['BRANCH'] = "some_branch"
-      Butcher.force_env!(:dev)
-      Butcher::Config[:branch].should == "some_branch"
+      Boucher.force_env!(:dev)
+      Boucher::Config[:branch].should == "some_branch"
     end
   end
 end

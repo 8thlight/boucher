@@ -1,6 +1,6 @@
-require 'butcher/compute'
+require 'boucher/compute'
 
-module Butcher
+module Boucher
   module Servers
     NotFound = Class.new(StandardError)
 
@@ -11,7 +11,7 @@ module Butcher
       end
 
       def reload
-        @instance = Butcher.compute.servers
+        @instance = Boucher.compute.servers
         @instance.each {} # Wake up you lazy list!
         cultivate(@instance)
       end
@@ -21,7 +21,7 @@ module Butcher
       end
 
       def cultivate(thing)
-        thing.extend(Butcher::Servers) if thing
+        thing.extend(Boucher::Servers) if thing
         thing
       end
     end
@@ -42,7 +42,7 @@ module Butcher
       servers = search(options)
       first = servers.first
       if first.nil?
-        raise Butcher::Servers::NotFound.new("No server matches criteria: #{options.inspect}")
+        raise Boucher::Servers::NotFound.new("No server matches criteria: #{options.inspect}")
       end
       first
     end
@@ -60,24 +60,24 @@ module Butcher
     end
 
     def self.start(server_id)
-      Butcher.change_server_state(server_id, :start, "running")
+      Boucher.change_server_state(server_id, :start, "running")
     end
 
     def self.stop(server_id)
-      Butcher.change_server_state(server_id, :stop, "stopped")
+      Boucher.change_server_state(server_id, :stop, "stopped")
     end
 
     def self.terminate(server)
-      Butcher::Nagios.remove_host(server)
+      Boucher::Nagios.remove_host(server)
       volumes = server.volumes
       volumes_to_destroy = volumes.select {|v| !v.delete_on_termination}
 
-      Butcher.change_server_state server.id, :destroy, "terminated"
+      Boucher.change_server_state server.id, :destroy, "terminated"
 
       volumes_to_destroy.each do |volume|
         volume.wait_for { volume.state == 'available' }
         puts "Destroying volume #{volume.id}..."
-        Butcher::Volumes.destroy(volume)
+        Boucher::Volumes.destroy(volume)
       end
     end
 
@@ -86,7 +86,7 @@ module Butcher
     end
 
     def [](klass)
-      find(:env => Butcher::Config[:env], :class => klass, :state => "running")
+      find(:env => Boucher::Config[:env], :class => klass, :state => "running")
     end
   end
 end

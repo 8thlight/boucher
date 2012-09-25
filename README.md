@@ -1,5 +1,5 @@
-<img src="" alt="butcher logo" title="Butcher" align="right"/>
-# Butcher
+<img src="" alt="boucher logo" title="Boucher" align="right"/>
+# Boucher
 
 ...
 

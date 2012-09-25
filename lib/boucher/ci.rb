@@ -1,8 +1,8 @@
-module Butcher
+module Boucher
   module CI
     def self.each_server(&block)
       threads = []
-      Butcher.each_required_server do |server, server_class|
+      Boucher.each_required_server do |server, server_class|
         thread = Thread.new { block.yield(server, server_class) }
         threads << thread
       end
@@ -10,8 +10,8 @@ module Butcher
     end
 
     def self.terminate_server(server_class)
-      server = Butcher.get_server(server_class, "ci", "running")
-      Butcher.change_server_state server.id, :destroy, "terminated" if server
+      server = Boucher.get_server(server_class, "ci", "running")
+      Boucher.change_server_state server.id, :destroy, "terminated" if server
     end
   end
 end

@@ -1,4 +1,4 @@
-module Butcher
+module Boucher
 
   module IO
 

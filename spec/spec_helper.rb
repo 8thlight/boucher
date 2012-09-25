@@ -1,5 +1,5 @@
 # MDM - Need to set config because it's never loaded in test
-module Butcher
+module Boucher
   NO_LOAD_CONFIG = true
   Config = {
           :aws_secret_access_key => "secret key",
@@ -9,13 +9,13 @@ module Butcher
 end
 
 require 'fog'
-require 'butcher/io'
-require 'butcher/env'
+require 'boucher/io'
+require 'boucher/env'
 
-Butcher.force_env!("dev")
+Boucher.force_env!("dev")
 
 Fog.mock!
-Butcher::IO.mock!
+Boucher::IO.mock!
 
 
 # MDM - Monkey patch wait_for methods so the tests are FASTER!

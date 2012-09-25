@@ -48,7 +48,7 @@ namespace :nagios do
 
   desc "Adds a nagios host to be monitored by this machine"
   task :add_host, [:name, :ip, :klass] do |t, args|
-    checks = Butcher::Nagios.checks_for(args.klass)
+    checks = Boucher::Nagios.checks_for(args.klass)
     return if checks.empty?
 
     File.open(make_config_path(args.name), "w") do |file|
@@ -65,7 +65,7 @@ namespace :nagios do
 
   desc "Opens the nagios web console"
   task :open do
-    server = Butcher::Servers["nagios_server"]
+    server = Boucher::Servers["nagios_server"]
     url = "http://#{server.public_ip_address}/nagios3"
     puts "Nagios lives at #{url}"
     puts "Login using nagiosadmin / 'we are many lonely souls'"
