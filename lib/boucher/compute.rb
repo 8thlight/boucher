@@ -38,26 +38,9 @@ module Boucher
     "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i #{Boucher::Config[:aws_key_filename]}.pem"
   end
 
-  def self.download(server, remote_filepath, local_filepath)
-    command = ["rsync", "-azb", "-e", ssh_command, "--delete-after", "#{Boucher::Config[:username]}@#{server.dns_name}:#{remote_filepath}", local_filepath]
-    Kernel.system(*command)
-    raise "command failed with code #{$?.exitstatus}: #{command.inspect}" unless $?.success?
-  end
-
-  def self.rsync(server, from, to)
-    command = ["rsync", "-azb", "-e", ssh_command, "--delete-after",
-      from, "#{Boucher::Config[:username]}@#{server.dns_name}:#{to}"]
-    Kernel.system(*command)
-    raise "command failed with code #{$?.exitstatus}: #{command.inspect}" unless $?.success?
-  end
-
   def self.update_recipes(server)
     puts "Updating recipes on #{server.id}"
     ssh server, "cd infrastructure && git checkout . && git clean -d -f && git pull && bundle"
-
-    %w[cookbooks config tasks].each do |folder|
-      rsync server, "#{folder}/", "infrastructure/#{folder}/"
-    end
   end
 
   def self.cook_meal(server, meal_name)

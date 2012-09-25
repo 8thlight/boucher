@@ -24,22 +24,6 @@ describe "Boucher Cloud" do
     Boucher.ssh(server, "some command")
   end
 
-  it "downloads a file" do
-    server = stub(:dns_name => "test_dns")
-    Kernel.should_receive(:system).with("rsync", "-azb", "-e", Boucher.ssh_command, "--delete-after", "#{Boucher::Config[:username]}@test_dns:/usr/lib/a_file.txt", "/usr/local/local_file.txt")
-    Boucher.download(server, "/usr/lib/a_file.txt", "/usr/local/local_file.txt")
-  end
-
-  it "rsyncs files" do
-    server = stub(:dns_name => "test_dns")
-
-    system "echo > /dev/null" # to populate $?
-    Kernel.should_receive(:system).with("rsync", "-azb", "-e", Boucher.ssh_command,
-      "--delete-after", "foo", "#{Boucher::Config[:username]}@test_dns:bar")
-
-    Boucher.rsync(server, "foo", "bar")
-  end
-
   it "opens an ssh shell" do
     server = OpenStruct.new(:dns_name => "test_dns")
 
@@ -49,12 +33,9 @@ describe "Boucher Cloud" do
     Boucher.ssh(server)
   end
 
-  it "updates recipes and rsyncs local changes" do
+  it "updates recipes" do
     server = OpenStruct.new(:id => "test_id")
     Boucher.should_receive(:ssh).with(server, "cd infrastructure && git checkout . && git clean -d -f && git pull && bundle")
-    Boucher.should_receive(:rsync).with(server, "cookbooks/", "infrastructure/cookbooks/")
-    Boucher.should_receive(:rsync).with(server, "config/", "infrastructure/config/")
-    Boucher.should_receive(:rsync).with(server, "tasks/", "infrastructure/tasks/")
 
     Boucher.update_recipes(server)
   end
