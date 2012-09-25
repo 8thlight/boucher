@@ -5,7 +5,6 @@ require 'boucher/meals'
 require 'boucher/provision'
 require 'boucher/servers'
 require 'boucher/volumes'
-require 'boucher/nagios'
 require 'retryable'
 
 def meals
@@ -67,7 +66,6 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   desc "Stops the specified server"
   task :stop, [:server_id] do |t, args|
     server = Boucher.compute.servers.get(args.server_id)
-    Boucher::Nagios.remove_host(server)
     Boucher::Servers.stop(args.server_id)
   end
 
@@ -75,7 +73,6 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   task :start, [:server_id] do |t, args|
     Boucher::Servers.start(args.server_id)
     server = Boucher.compute.servers.get(args.server_id)
-    Boucher::Nagios.add_host(server)
   end
 
   desc "Open an SSH session with the specified server"
@@ -103,8 +100,8 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
 
   desc "Provision new server [#{Boucher.meals.keys.sort.join(', ')}]"
   task :provision, [:meal] do |t, args|
-    meal_map = Boucher.meals[args.meal.to_sym]
-    Boucher.provision(args.meal, meal_map)
+    meal = Boucher.meal(args.meal)
+    Boucher.provision(meal)
   end
 
   desc "Provision new, or chef existing server of the specified meal"

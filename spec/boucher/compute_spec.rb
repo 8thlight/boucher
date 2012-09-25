@@ -1,6 +1,5 @@
 require_relative "../spec_helper"
 require 'boucher/compute'
-require 'boucher/nagios'
 require 'ostruct'
 
 describe "Boucher Cloud" do
@@ -64,9 +63,7 @@ describe "Boucher Cloud" do
     server = OpenStruct.new(:id => "test_id")
 
     Boucher.should_receive(:update_recipes).with(server)
-    Boucher.should_receive(:ssh).with(server, "cd infrastructure && sudo BUTCHER_ENV=env_name BRANCH=branch_name chef-solo -c config/solo.rb -j config/meal_name.json")
-    Boucher::Nagios.should_receive(:remove_host).with(server)
-    Boucher::Nagios.should_receive(:add_host).with(server)
+    Boucher.should_receive(:ssh).with(server, "cd infrastructure && git pull && sudo BUTCHER_ENV=env_name BRANCH=branch_name chef-solo -c config/solo.rb -j config/meal_name.json")
     Boucher::Config[:branch] = "branch_name"
     Boucher::Config[:env] = "env_name"
 

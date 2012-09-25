@@ -2,7 +2,6 @@ require 'boucher/compute'
 require 'boucher/io'
 require 'boucher/servers'
 require 'boucher/volumes'
-require 'boucher/nagios'
 require 'retryable'
 
 module Boucher
@@ -30,47 +29,44 @@ module Boucher
     end
   end
 
-  def self.establish_server(server, meal)
+  def self.establish_server(server, meal_name)
+    meal = Boucher.meal(meal_name)
     if server.nil?
-      Boucher.provision(meal, Boucher.meals[meal.to_sym])
+      Boucher.provision(meal)
     elsif server.state == "stopped"
       Boucher::Servers.start(server.id)
       server.reload
-      Boucher.cook_meals_on_server(meal, Boucher.meals[meal.to_sym], server)
+      Boucher.cook_meal_on_server(meal, server)
     else
-      Boucher.cook_meals_on_server(meal, Boucher.meals[meal.to_sym], server)
+      Boucher.cook_meal_on_server(meal, server)
     end
   end
 
-  def self.provision(meal, meal_map)
-    puts "Provisioning new #{meal} server..."
-    server = create_meal_server(meal_map)
+  def self.provision(meal)
+    puts "Provisioning new #{meal[:name]} server..."
+    server = create_meal_server(meal)
     wait_for_server_to_boot(server)
     wait_for_server_to_accept_ssh(server)
-    volumes = create_volumes(meal_map, server)
+    volumes = create_volumes(meal, server)
     attach_volumes(volumes, server)
-    cook_meals_on_server(meal, meal_map, server)
-    puts "\nThe new #{meal} server has been provisioned! id: #{server.id}"
+    cook_meal_on_server(meal, server)
+    puts "\nThe new #{meal[:name]} server has been provisioned! id: #{server.id}"
   end
 
   def self.attach_elastic_ips(meal, server)
     puts "Attaching elastic IPs..."
-    return unless Boucher::Config[:elastic_ips] && Boucher::Config[:elastic_ips][meal]
+    ips = meal[:elastic_ips] || []
 
-    puts "Associating #{server.id} with #{Boucher::Config[:elastic_ips][meal]}"
-    compute.associate_address(server.id, Boucher::Config[:elastic_ips][meal])
+    ips.each do |ip|
+      puts "Associating #{server.id} with #{ip}"
+      compute.associate_address(server.id, ip)
+    end
   end
 
   private
 
-  def self.cook_meals_on_server(meal, meal_map, server)
-    return unless meal_map[:meals]
-
-    meal_map[:meals].each do |meal|
-      meal = meal.call if meal.is_a?(Proc)
-      Boucher.cook_meal(server, meal)
-    end
-
+  def self.cook_meal_on_server(meal, server)
+    Boucher.cook_meal(server, meal[:name])
     attach_elastic_ips(meal, server)
   end
 
@@ -87,16 +83,16 @@ module Boucher
     Boucher.print_servers([server])
   end
 
-  def self.create_meal_server(meal_map)
+  def self.create_meal_server(meal)
     server = compute.servers.new(:tags => {})
-    Boucher.setup_meal(server, meal_map)
+    Boucher.setup_meal(server, meal)
     server.save
     Boucher.print_servers([server])
     server
   end
 
-  def self.create_volumes(meal_map, server)
-    Array(meal_map[:volumes]).map do |volume_name|
+  def self.create_volumes(meal, server)
+    Array(meal[:volumes]).map do |volume_name|
       attributes = Boucher.volume_configs[volume_name]
       snapshot = snapshots.get(attributes[:snapshot])
       puts "Creating volume from snapshot #{snapshot.id}..."

@@ -17,7 +17,7 @@ module Boucher
   end
 
   def self.verbose(*args)
-    if ENV["VERBOSE"] != "false"
+    if ENV["VERBOSE"]
       puts *args
     end
   end

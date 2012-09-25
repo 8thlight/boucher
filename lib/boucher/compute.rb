@@ -60,13 +60,9 @@ module Boucher
     end
   end
 
-  def self.cook_meal(server, meal)
-    Boucher::Nagios.remove_host(server)
-
+  def self.cook_meal(server, meal_name)
     update_recipes(server)
-    ssh server, "cd infrastructure && git pull && sudo BUTCHER_ENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal}.json"
-
-    Boucher::Nagios.add_host(server)
+    ssh server, "cd infrastructure && git pull && sudo BUTCHER_ENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal_name}.json"
   end
 
   def self.ssh_open?(server)

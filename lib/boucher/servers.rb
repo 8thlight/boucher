@@ -68,7 +68,6 @@ module Boucher
     end
 
     def self.terminate(server)
-      Boucher::Nagios.remove_host(server)
       volumes = server.volumes
       volumes_to_destroy = volumes.select {|v| !v.delete_on_termination}
 

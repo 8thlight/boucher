@@ -16,10 +16,16 @@ module Boucher
       Dir.glob(File.join("config", "*.json")).each do |file|
         spec = json_to_meal(::IO.read(file))
         meal_name = File.basename(file)[0...-5].to_sym
-        @meals[meal_name] = spec
+        @meals[meal_name] = spec.merge(:name => meal_name)
       end
     end
     @meals
+  end
+
+  def self.meal(meal_name)
+    the_meal = meals[meal_name.to_sym]
+    raise "Missing meal: #{mean_name}" unless the_meal
+    return the_meal
   end
 
   def self.setup_meal(server, meal)

@@ -5,7 +5,6 @@ require 'boucher/meals'
 require 'boucher/provision'
 require 'boucher/servers'
 require 'boucher/volumes'
-require 'boucher/nagios'
 
 desc "Starts a console with the Boucher modules loaded"
 task :console do
