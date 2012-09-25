@@ -64,7 +64,7 @@ module Boucher
     Boucher::Nagios.remove_host(server)
 
     update_recipes(server)
-    ssh server, "cd infrastructure && sudo BUTCHER_ENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal}.json"
+    ssh server, "cd infrastructure && git pull && sudo BUTCHER_ENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal}.json"
 
     Boucher::Nagios.add_host(server)
   end

@@ -12,6 +12,9 @@ describe "Boucher Server Meals" do
   it "pull classification from json" do
     json = "{\"boucher\": {\"foo\": 1,\n \"bar\": 2}}"
     Boucher.json_to_meal(json).should == {:foo => 1, :bar => 2}
+
+    json = "{}"
+    Boucher.json_to_meal(json).should == {}
   end
 
   it "can classify base server" do

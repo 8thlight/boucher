@@ -7,7 +7,7 @@ module Boucher
   def self.json_to_meal(json)
     parser = JSON.parser.new(json, :symbolize_names => true)
     config = parser.parse
-    config[:boucher]
+    config[:boucher] || {}
   end
 
   def self.meals
@@ -15,7 +15,7 @@ module Boucher
       @meals = {}
       Dir.glob(File.join("config", "*.json")).each do |file|
         spec = json_to_meal(::IO.read(file))
-        meal_name = File.basename(file).to_sym
+        meal_name = File.basename(file)[0...-5].to_sym
         @meals[meal_name] = spec
       end
     end
