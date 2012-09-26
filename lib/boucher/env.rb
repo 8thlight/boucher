@@ -5,7 +5,7 @@ module Boucher
   } unless defined?(Boucher::Config)
 
   def self.env_name
-    ENV["BUTCHER_ENV"] ? ENV["BUTCHER_ENV"] : :dev
+    ENV["BENV"] ? ENV["BENV"] : :dev
   end
 
   env_dir = File.expand_path("config/env")
@@ -14,7 +14,7 @@ module Boucher
 
   unless defined?(Boucher::NO_LOAD_CONFIG)
     unless File.exists?(env_path)
-      raise "Config file #{env_path} doesn't exist.\nYou need to change your BUTCHER_ENV environment variable to a valid environment name.\nValid environments: #{valid_envs.join(", ")}"
+      raise "Config file #{env_path} doesn't exist.\nYou need to change your BENV environment variable to a valid environment name.\nValid environments: #{valid_envs.join(", ")}"
     end
 
     load env_path
@@ -35,8 +35,8 @@ module Boucher
   end
 
   def self.assert_env!
-    unless ENV['BUTCHER_ENV']
-      raise 'BUTCHER_ENV must be set before running this command'
+    unless ENV['BENV']
+      raise 'BENV must be set before running this command'
     end
   end
 end

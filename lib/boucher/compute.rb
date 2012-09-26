@@ -45,7 +45,7 @@ module Boucher
 
   def self.cook_meal(server, meal_name)
     update_recipes(server)
-    ssh server, "cd infrastructure && sudo BUTCHER_ENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal_name}.json"
+    ssh server, "cd infrastructure && sudo BENV=#{Boucher::Config[:env]} BRANCH=#{Boucher::Config[:branch]} chef-solo -c config/solo.rb -j config/#{meal_name}.json"
   end
 
   def self.ssh_open?(server)

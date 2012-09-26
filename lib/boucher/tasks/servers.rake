@@ -104,7 +104,7 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
 
   desc "Provision new, or chef existing server of the specified meal"
   task :establish, [:meal] do |t, args|
-    server = Boucher.find_server(args.meal, ENV['BUTCHER_ENV'])
+    server = Boucher.find_server(args.meal, ENV['BENV'])
     Boucher.establish_server(server, args.meal)
   end
 

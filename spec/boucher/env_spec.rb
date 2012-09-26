@@ -3,21 +3,21 @@ require 'spec_helper'
 describe "Environment" do
   describe "env" do
     before do
-      @old_env = ENV['BUTCHER_ENV']
+      @old_env = ENV['BENV']
     end
 
     after do
-      ENV['BUTCHER_ENV'] = @old_env
+      ENV['BENV'] = @old_env
     end
 
     it "defaults to :dev" do
-      ENV.delete('BUTCHER_ENV')
+      ENV.delete('BENV')
       #load File.expand_path(File.dirname(__FILE__) + "/../../lib/boucher/env.rb")
       Boucher::env_name.should == :dev
     end
 
     it "can be set via an environment variable" do
-      ENV['BUTCHER_ENV'] = "ci"
+      ENV['BENV'] = "ci"
       load File.expand_path(File.dirname(__FILE__) + "/../../lib/boucher/env.rb")
       Boucher::env_name.should == "ci"
     end
