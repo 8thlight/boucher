@@ -82,10 +82,8 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
     Boucher.ssh server
   end
 
-  puts "Downloading #{args.filepath}"
   desc "Download a file from the server"
   task :download, [:server_id, :filepath] do |t, args|
-
     server = Boucher.compute.servers.get(args.server_id)
     remote_path = args.filepath
     local_path = File.expand_path(File.join("..", "..", File.basename(args.filepath)), __FILE__)
