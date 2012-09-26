@@ -111,17 +111,27 @@ allows you too add extra configuration information under the "Boucher": key.  Fo
     {
       "run_list": [
         "recipe[boucher::base]"
-        ]
+        ],
 
-      "Boucher": {
-        "base_image_id": "ami-abcd1234" // overides :default_image_id config
-        "flavor_id": t1.micro // overides :default_flavor_id config
-        "groups": ["SSH"] // overides :default_groups config
-        "key_name": ["SSH"] // overides :aws_key_filename config
-        "elastic_ips": [1.2.3.4] // a list of elastic IPs that'll be attached to the server.  Elastic IP's acquired via AWS management console.
-        "volumes": ["volume1"] // a list of volume names that'll be attached to the server.  Volumes acquired via AWS management console.
+      "boucher": {
+        "base_image_id": "ami-abcd1234", // overides :default_image_id config
+        "flavor_id": "t1.micro", // overides :default_flavor_id config
+        "groups": ["SSH"], // overides :default_groups config
+        "key_name": ["some_key"], // overides :aws_key_filename config
+        "elastic_ips": ["1.2.3.4"], // a list of elastic IPs that'll be attached to the server.  Elastic IP's acquired via AWS management console.
+        "volumes": ["some_volume"] // a list of volume names that'll be attached to the server.  Volumes acquired via AWS management console.
       }
     }
+
+ERB: The "boucher": content can contain ERB.  So you can use config params like so:
+
+         {
+           "run_list": ...
+
+           "boucher": {
+             "flavor_id": "<%= Boucher::Config[:customer_flavor_id] %>"
+           }
+         }
 
 ### Environments
 
@@ -136,7 +146,9 @@ Environment configuration is available in your chef recipes.  Just require 'bouc
 
 ### Recipes
 
-We'll assume you're familiar with Chef.  Borrow, Steal, or Build recipes as you like.  They go in the cookbooks directory.
+We'll assume you're familiar with Chef.  So you know, there are plany of open source cookbooks/recipes on the intertubes.
+Convention is to grab the files, put them in your cookbooks folder and take ownership of them.  There's a good chance you'll
+want to change them.
 
 ## License
 

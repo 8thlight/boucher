@@ -1,10 +1,13 @@
 require 'boucher/env'
 require 'boucher/util'
+require 'erb'
 require 'json'
 
 module Boucher
 
   def self.json_to_meal(json)
+    template = ERB.new(json)
+    json = template.result(binding)
     parser = JSON.parser.new(json, :symbolize_names => true)
     config = parser.parse
     config[:boucher] || {}

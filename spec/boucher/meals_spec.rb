@@ -17,6 +17,12 @@ describe "Boucher Server Meals" do
     Boucher.json_to_meal(json).should == {}
   end
 
+  it "meal config can have ERB content" do
+    Boucher::Config[:foo] = "FOOEY!"
+    json = "{\"boucher\": {\"foo\": \"<%= Boucher::Config[:foo] %>\"}}"
+    Boucher.json_to_meal(json).should == {:foo => "FOOEY!"}
+  end
+
   it "can classify base server" do
     some_class = {:meal_name => "base",
                   :meals => ["base"]}
