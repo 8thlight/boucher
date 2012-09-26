@@ -37,8 +37,8 @@ module Boucher
     server.groups = meal[:groups] || Boucher::Config[:default_groups]
     server.key_name = meal[:key_name] || Boucher::Config[:aws_key_filename]
     server.tags = {}
-    server.tags["Name"] = "#{meal[:meal_name] || "base"} #{Time.new.strftime("%Y%m%d%H%M%S")}"
-    server.tags["Meal"] = meal[:meal_name] || "base"
+    server.tags["Name"] = "#{meal[:name] || "base"} #{Time.new.strftime("%Y%m%d%H%M%S")}"
+    server.tags["Meal"] = meal[:name] || "base"
     server.tags["CreatedAt"] = Time.new.strftime("%Y%m%d%H%M%S")
     server.tags["Creator"] = current_user
     server.tags["Env"] = Boucher::Config[:env]
