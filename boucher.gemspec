@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = "boucher"
-  s.version     = "0.1"
+  s.version     = "0.1.1"
   s.authors     = ["'Micah Micah'"]
   s.email       = ["'micah@8thlight.com'"]
   s.homepage    = "http://github.com/8thlight/boucher"
@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = []
   s.require_paths = ["lib"]
-  s.autorequire = 'boucher/tasks'
 
   s.add_dependency('rake', '>= 0.9.2.2')
   s.add_dependency('fog', '>= 1.6.0')

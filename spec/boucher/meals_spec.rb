@@ -20,11 +20,11 @@ describe "Boucher Server Meals" do
   it "can classify base server" do
     some_class = {:meal_name => "base",
                   :meals => ["base"]}
-    Boucher::Config[:default_instance_flavor_id] = 'm1.small'
-    Boucher::Config[:default_instance_groups] = ["SSH"]
+    Boucher::Config[:default_flavor_id] = 'm1.small'
+    Boucher::Config[:default_groups] = ["SSH"]
     Boucher.setup_meal(@server, some_class)
 
-    @server.image_id.should == Boucher::Config[:base_image_id]
+    @server.image_id.should == Boucher::Config[:default_image_id]
     @server.flavor_id.should == 'm1.small'
     @server.groups.should == ["SSH"]
     @server.key_name.should == "test_key"

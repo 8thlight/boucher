@@ -29,9 +29,9 @@ module Boucher
   end
 
   def self.setup_meal(server, meal)
-    server.image_id = meal[:base_image_id] || Boucher::Config[:base_image_id]
-    server.flavor_id = meal[:flavor_id] || Boucher::Config[:default_instance_flavor_id]
-    server.groups = meal[:groups] || Boucher::Config[:default_instance_groups]
+    server.image_id = meal[:image_id] || Boucher::Config[:default_image_id]
+    server.flavor_id = meal[:flavor_id] || Boucher::Config[:default_flavor_id]
+    server.groups = meal[:groups] || Boucher::Config[:default_groups]
     server.key_name = meal[:key_name] || Boucher::Config[:aws_key_filename]
     server.tags = {}
     server.tags["Name"] = "#{meal[:meal_name] || "base"} #{Time.new.strftime("%Y%m%d%H%M%S")}"
