@@ -38,9 +38,5 @@ module Boucher
     unless ENV['BUTCHER_ENV']
       raise 'BUTCHER_ENV must be set before running this command'
     end
-
-    unless ENV['BRANCH']
-      raise 'BRANCH must be set before running this command'
-    end
   end
 end

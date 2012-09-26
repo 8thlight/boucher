@@ -63,18 +63,16 @@ If you use github, you'll have to generate ssh keys and add them to the github r
     cd ..
     git clone git@github.com:<github account name>/<your infratructure project name>.git infrastructure
 
-10. Customize to your liking.
+11. Customize to your liking.
 
   * install your preferred vim dot files
   * etc...
 
-
-
-
-
 ## Usage
 
-...
+Run rake to see the list of tasks provided.
+
+    rake -T
 
 ## License
 

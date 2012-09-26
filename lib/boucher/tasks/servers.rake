@@ -82,9 +82,9 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
     Boucher.ssh server
   end
 
+  puts "Downloading #{args.filepath}"
   desc "Download a file from the server"
   task :download, [:server_id, :filepath] do |t, args|
-    puts "Downloading #{args.filepath}"
 
     server = Boucher.compute.servers.get(args.server_id)
     remote_path = args.filepath
@@ -106,14 +106,12 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
 
   desc "Provision new, or chef existing server of the specified meal"
   task :establish, [:meal] do |t, args|
-    Boucher.assert_env!
     server = Boucher.find_server(args.meal, ENV['BUTCHER_ENV'])
     Boucher.establish_server(server, args.meal)
   end
 
   desc "Cook the given meal on the given server"
   task :chef, [:meal, :server_id] do |t, args|
-    Boucher.assert_env!
     server = Boucher.compute.servers.get(args.server_id)
     Boucher.cook_meal(server, args.meal)
   end

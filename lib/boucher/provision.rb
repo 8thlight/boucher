@@ -18,17 +18,6 @@ module Boucher
     get_server(meal, environment, "stopped") || get_server(meal, environment, "running")
   end
 
-  def self.establish_all_servers
-    Boucher.each_required_server do |server, meal|
-      # Retries after 2, 4, 8, 16, 32, and 64 seconds
-      retryable(:tries => 6, :sleep => lambda { |n| 2**n }) do
-        # A RuntimeError will sometimes be thrown here, with a message of:
-        # "command failed with code 255"
-        Boucher.establish_server(server, meal)
-      end
-    end
-  end
-
   def self.establish_server(server, meal_name)
     meal = Boucher.meal(meal_name)
     if server.nil?
