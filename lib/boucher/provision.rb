@@ -55,7 +55,7 @@ module Boucher
   private
 
   def self.cook_meal_on_server(meal, server)
-    puts "Cooking meal '#{mean[:name]}' on server: #{server}"
+    puts "Cooking meal '#{meal[:name]}' on server: #{server}"
     Boucher.cook_meal(server, meal[:name])
     attach_elastic_ips(meal, server)
   end

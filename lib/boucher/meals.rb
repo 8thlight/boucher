@@ -27,7 +27,7 @@ module Boucher
 
   def self.meal(meal_name)
     the_meal = meals[meal_name.to_sym]
-    raise "Missing meal: #{mean_name}" unless the_meal
+    raise "Missing meal: #{meal_name}" unless the_meal
     return the_meal
   end
 
