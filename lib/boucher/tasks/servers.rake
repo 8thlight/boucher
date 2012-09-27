@@ -118,7 +118,7 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
       servers = [Boucher.compute.servers.get(args.server_id)]
     else
       puts "Searching for running #{args.meal} servers in #{Boucher.env_name} environment..."
-      servers = Boucher::Servers.search(:meal => args.meal, :env => Boucher.env_name :state => "running")
+      servers = Boucher::Servers.search(:meal => args.meal, :env => Boucher.env_name, :state => "running")
       puts "Found #{servers.size}."
     end
     servers.each do |server|
