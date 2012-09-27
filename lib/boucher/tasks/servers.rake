@@ -98,20 +98,32 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
 
   desc "Provision new server [#{Boucher.meals.keys.sort.join(', ')}]"
   task :provision, [:meal] do |t, args|
+    Boucher.assert_env!
     meal = Boucher.meal(args.meal)
     Boucher.provision(meal)
   end
 
   desc "Provision new, or chef existing server of the specified meal"
   task :establish, [:meal] do |t, args|
+    Boucher.assert_env!
     server = Boucher.find_server(args.meal, ENV['BENV'])
     Boucher.establish_server(server, args.meal)
   end
 
-  desc "Cook the given meal on the given server"
+  desc "Cook the specified meal on the instance specified, or deployed instances of that meal"
   task :chef, [:meal, :server_id] do |t, args|
-    server = Boucher.compute.servers.get(args.server_id)
-    Boucher.cook_meal(server, args.meal)
+    Boucher.assert_env!
+    servers = []
+    if(args.server_id)
+      servers = [Boucher.compute.servers.get(args.server_id)]
+    else
+      puts "Searching for #{args.meal} servers in #{Boucher.env_name} environment..."
+      servers = Boucher::Servers.search(:meal => args.meal, :env => Boucher.env_name)
+      puts "Found #{servers.size}."
+    end
+    servers.each do |server|
+      Boucher.cook_meal(server, args.meal)
+    end
   end
 end
 
