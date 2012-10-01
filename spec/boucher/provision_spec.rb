@@ -67,5 +67,61 @@ describe "Boucher Provisioning" do
 
       Boucher.provision :name => "some_meal", :elastic_ips => %w(1.2.3.4)
     end
+
+    it "attaches volumes" do
+      Boucher.stub!(:ssh)
+      Boucher.should_receive(:setup_meal)
+      Boucher.stub(:cook_meals_on_server)
+
+      Boucher.should_receive(:attach_volumes)
+
+      Boucher.provision :name => "some_meal", :volumes => {}
+    end
+  end
+
+  context "Volumes" do
+
+    let(:server) { server = Boucher.compute.servers.new; server.save; server }
+
+    it "attaches an existing volume" do
+      volume = Boucher::Volumes.create(:size => 12, :availability_zone => "us-east-1c")
+
+      meal_spec = {:volumes => {"/dev/sda2" => {:volume_id => volume.id}}}
+      Boucher.attach_volumes(meal_spec, server)
+
+      server.reload
+      server.volumes.size.should == 1
+      server.volumes.first.device.should == "/dev/sda2"
+      server.volumes.first.availability_zone.should == "us-east-1c"
+      server.volumes.first.size.should == 12
+    end
+
+    it "attaches a new volume based on a snapshot" do
+      old_volume = Boucher::Volumes.create(:size => 12, :availability_zone => "us-east-1c")
+      response = old_volume.snapshot("test")
+      snapshot_id = response.body["snapshotId"]
+
+      meal_spec = {:volumes => {"/dev/sda3" => {:snapshot_id => snapshot_id}}}
+      Boucher.attach_volumes(meal_spec, server)
+
+      server.reload
+      server.volumes.size.should == 1
+      volume = server.volumes.first
+      volume.snapshot_id.should == snapshot_id
+      volume.size.should == 12
+      volume.device.should == "/dev/sda3"
+    end
+
+    it "attaches a new volume with specified size" do
+      meal_spec = {:volumes => {"/dev/sda4" => {:size => 42}}}
+      Boucher.attach_volumes(meal_spec, server)
+
+      server.reload
+      server.volumes.size.should == 1
+      volume = server.volumes.first
+      volume.size.should == 42
+      volume.device.should == "/dev/sda4"
+    end
+
   end
 end

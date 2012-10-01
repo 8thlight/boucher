@@ -19,18 +19,19 @@ Boucher::IO.mock!
 
 
 # MDM - Monkey patch wait_for methods so the tests are FASTER!
-module Fog
-  def self.wait_for(timeout=Fog.timeout, interval=1)
-    yield
-  end
-end
+# Unfortunately, Fog mocks depends on real time delays :.-(
+#module Fog
+#  def self.wait_for(timeout=Fog.timeout, interval=1)
+#    yield
+#  end
+#end
 
-require 'fog/core/model'
-
-module Fog
-  class Model
-    def wait_for(timeout=Fog.timeout, interval=1, &block)
-      yield
-    end
-  end
-end
+#require 'fog/core/model'
+#
+#module Fog
+#  class Model
+#    def wait_for(timeout=Fog.timeout, interval=1, &block)
+#      yield
+#    end
+#  end
+#end

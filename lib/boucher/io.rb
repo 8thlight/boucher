@@ -52,32 +52,21 @@ module Boucher
     puts
   end
 
+  VOLUME_TABLE_FORMAT = "%-12s  %-15s  %-6s  %-10s  %-10s  %-13s\n"
+
   def self.print_volumes(volumes)
-    id_sizes = []
-    size_sizes = []
-    state_sizes = []
-    zone_sizes = []
-    snapshot_sizes = []
+    puts
+    printf VOLUME_TABLE_FORMAT, "ID", "Name", "Size", "Server", "State", "Snapshot"
+    puts ("-" * 76)
 
-    Array(volumes).each do |volume|
-      id_sizes << volume.id.length
-      size_sizes << volume.size.to_s.length
-      state_sizes << volume.state.length
-      zone_sizes << volume.availability_zone.length
-      snapshot_sizes << volume.snapshot_id.to_s.length
-    end
-
-    id_length = id_sizes.max + 5
-    size_length = size_sizes.max + 5
-    state_length = state_sizes.max + 5
-    zone_length = zone_sizes.max + 5
-    snapshot_length = snapshot_sizes.max
-
-    puts "ID#{" "*(id_length - 2)}Size#{" "*(size_length - 4)}State#{" "*(state_length - 5)}Zone#{" "*(zone_length - 4)}Snapshot"
-    puts "-"*(id_length + size_length + state_length + zone_length + snapshot_length)
-
-    Array(volumes).each do |volume|
-      puts "#{volume.id}#{" "*(id_length - volume.id.length)}#{volume.size}GB#{" "*(size_length - volume.size.to_s.length - 2)}#{volume.state}#{" "*(state_length - volume.state.length)}#{volume.availability_zone}#{" "*(zone_length - volume.availability_zone.length)}#{volume.snapshot_id}#{" "*(snapshot_length - volume.snapshot_id.to_s.length)}"
+    volumes.each do |volume|
+      printf VOLUME_TABLE_FORMAT,
+             volume.id,
+             (volume.tags["Name"] || "")[0...15],
+             volume.size.to_s + "GB",
+             volume.server_id,
+             volume.state,
+             volume.snapshot_id
     end
   end
 

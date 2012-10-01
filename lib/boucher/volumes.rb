@@ -1,11 +1,6 @@
 require 'boucher/compute'
 
 module Boucher
-  def self.destroy_volume(volume_id)
-    volume = Boucher::Volumes.with_id(volume_id)
-    Volumes.destroy(volume)
-  end
-
   module Volumes
     def self.all
       @volumes ||= Boucher.compute.volumes
@@ -19,23 +14,25 @@ module Boucher
     end
 
     def self.with_id(volume_id)
-      all.find {|volume| volume.id == volume_id}
+      all.find { |volume| volume.id == volume_id }
     end
 
-    def self.create(zone, snapshot, device)
-      response  = Boucher.compute.create_volume(zone, snapshot.volume_size.to_i, snapshot.id)
-      volume_id = response.body["volumeId"]
-      volume    = Boucher.compute.volumes.get(volume_id)
-
-      volume.wait_for { ready? }
-      volume.device = device
-      volume
-    end
-
-    def self.attach(volumes, server)
-      Array(volumes).each do |volume|
-        Boucher.compute.attach_volume(server.id, volume.id, volume.device)
+    def self.create(options)
+      zone = options[:availability_zone]
+      raise ":availability_zone is required to create a volume." unless zone
+      size = options[:size]
+      snapshot_id = options[:snapshot_id]
+      response = if snapshot_id
+        snapshot = Boucher::compute.snapshots.get(snapshot_id)
+        size = snapshot.volume_size.to_i
+        Boucher.compute.create_volume(zone, size, "SnapshotId" => snapshot_id)
+      else
+        Boucher.compute.create_volume(zone, size)
       end
+      volume_id = response.body["volumeId"]
+      volume = Boucher.compute.volumes.get(volume_id)
+      volume.wait_for { volume.ready? }
+      volume
     end
   end
 end

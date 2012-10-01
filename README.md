@@ -119,11 +119,13 @@ allows you too add extra configuration information under the "Boucher": key.  Fo
         "groups": ["SSH"], // overides :default_groups config
         "key_name": ["some_key"], // overides :aws_key_filename config
         "elastic_ips": ["1.2.3.4"], // a list of elastic IPs that'll be attached to the server.  Elastic IP's acquired via AWS management console.
-        "volumes": ["some_volume"] // a list of volume names that'll be attached to the server.  Volumes acquired via AWS management console.
+        "volumes": {"/dev/sda2": <volume spec>} // See Volume Specs below
       }
     }
 
-ERB: The "boucher": content can contain ERB.  So you can use config params like so:
+### ERB in config
+
+Meal .json files may contain ERB in the "boucher" section.  However, the file get's parsed by chef-solo so it has to remain a valid JSON file.  But you can do things like this:
 
          {
            "run_list": ...
@@ -132,6 +134,28 @@ ERB: The "boucher": content can contain ERB.  So you can use config params like 
              "flavor_id": "<%= Boucher::Config[:customer_flavor_id] %>"
            }
          }
+
+Also keep in mind that you can use ERB in recipes' template files.
+
+### Volume Specs
+
+Volumes may be specified in the config for a given meal. The "volumes": entry must be a hash where keys are the device name (mount point) and the values
+are a hash describing the volume.  There are really three variations:
+
+1) Mounting an existing volume by using the volume_id:
+
+    "volumes": {"/dev/sda3" => {"volume_id": "volume-abc123"}}
+
+2) Mount a new volume based on an existing snapshot:
+
+    "volumes": {"/dev/sda4" => {"snapshot_id": "snapshot-abc123"}}
+
+3) Mount a new volume of a given size:
+
+    "volumes": {"/dev/sda5" => {"size": 16}}
+
+If volumes are not specified, AWS will apply the default volume setup in the management console.
+
 
 ### Environments
 

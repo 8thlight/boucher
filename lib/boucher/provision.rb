@@ -36,8 +36,7 @@ module Boucher
     server = create_meal_server(meal)
     wait_for_server_to_boot(server)
     wait_for_server_to_accept_ssh(server)
-    volumes = create_volumes(meal, server)
-    attach_volumes(volumes, server)
+    attach_volumes(meal, server)
     cook_meal_on_server(meal, server)
     puts "\nThe new #{meal[:name]} server has been provisioned! id: #{server.id}"
   end
@@ -81,21 +80,28 @@ module Boucher
     server
   end
 
-  def self.create_volumes(meal, server)
-    Array(meal[:volumes]).map do |volume_name|
-      attributes = Boucher.volume_configs[volume_name]
-      snapshot = snapshots.get(attributes[:snapshot])
-      puts "Creating volume from snapshot #{snapshot.id}..."
-      Boucher::Volumes.create(server.availability_zone, snapshot, attributes[:device])
+  def self.attach_volumes(meal, server)
+    volumes = meal[:volumes]
+    return unless volumes && volumes.size > 0
+    puts "Attaching volumes..."
+    volumes.each do |device, spec|
+      volume = acquire_volume(spec, server)
+      print "Attaching volume #{volume.id} to #{server.id}..."
+      Boucher.compute.attach_volume(server.id, volume.id, device)
+      volume.wait_for { print "."; volume.state == "in-use" }
+      puts
     end
   end
 
-  def self.attach_volumes(volumes, server)
-    volumes.each do |volume|
-      print "Attaching volume #{volume.id} to #{server.id}..."
-      Boucher::Volumes.attach(volume, server)
-      volume.wait_for { print "."; state == "in-use" }
-      puts
+  def self.acquire_volume(spec, server)
+    if spec[:volume_id]
+      Boucher.compute.volumes.get(spec[:volume_id])
+    elsif spec[:snapshot_id]
+      puts "Creating volume based on snapshot: #{spec[:snapshot_id]}"
+      Boucher::Volumes.create(:snapshot_id => spec[:snapshot_id], :availability_zone => server.availability_zone)
+    else
+      puts "Creating new volume of size: #{spec[:size]}GB"
+      Boucher::Volumes.create(:size => spec[:size].to_i, :availability_zone => server.availability_zone)
     end
   end
 end

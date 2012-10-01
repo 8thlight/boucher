@@ -9,6 +9,12 @@ namespace :volumes do
 
   desc "Destroy the specified volume"
   task :destroy, [:volume_id] do |t, args|
-    Boucher.destroy_volume(args.volume_id)
+    volume = Boucher::Volumes.with_id(args.volume_id)
+    if volume
+      puts "Destroying volume:"
+      print_volumes [volume]
+    else
+      raise "Volume not found: #{args.volume_id}"
+    end
   end
 end
