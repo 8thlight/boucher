@@ -4,7 +4,7 @@ require 'boucher/provision'
 describe "Boucher Provisioning" do
 
   before do
-    Boucher::Config[:elastic_ips] = nil
+    Boucher::Servers.clear
   end
 
   after do
@@ -30,16 +30,6 @@ describe "Boucher Provisioning" do
       Boucher.establish_server server, "some_meal"
     end
 
-    it "attaches elastic IPs if the server was stopped" do
-      server = mock(:id => "the id", :state => "stopped", :reload => nil)
-      Boucher.stub(:meal).and_return({:name => "some_meal", :elastic_ips => %w(1.2.3.4)})
-      Boucher.stub(:change_server_state)
-      Boucher.stub(:cook_meal)
-      Boucher.compute.should_receive(:associate_address).with(anything, "1.2.3.4")
-
-      Boucher.establish_server server, "meal_name"
-    end
-
     it "cooks meals on server if it is up and running" do
       running_server = mock(:id => "the id", :state => "running")
       meal = {:name => "some_meal"}
@@ -60,12 +50,17 @@ describe "Boucher Provisioning" do
     end
 
     it "provisions a server with elastic IP" do
+      Boucher.compute.key_pairs.create(name: "test_key")
+      ip = Boucher.compute.addresses.create
       Boucher.stub!(:ssh)
-      Boucher.should_receive(:setup_meal)
-      Boucher.stub(:cook_meal)
-      Boucher.compute.should_receive(:associate_address).with(anything, "1.2.3.4")
+      Boucher.stub!(:cook_meal)
 
-      Boucher.provision :name => "some_meal", :elastic_ips => %w(1.2.3.4)
+      Boucher.provision :name => "some_meal", :elastic_ips => [ip.public_ip]
+
+      server = Boucher::Servers["some_meal"]
+      server.reload
+      server.addresses.size.should == 1
+      server.addresses.first.public_ip.should == ip.public_ip
     end
 
     it "attaches volumes" do

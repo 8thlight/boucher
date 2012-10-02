@@ -12,12 +12,11 @@ describe "Boucher::Volumes" do
     }
 
     before do
-      @env = Boucher::Config[:env]
       Boucher.compute.stub(:volumes).and_return(remote_volumes)
     end
 
     after do
-      Boucher::Config[:env] = @env
+      Boucher::Config[:env] = "test"
     end
 
     it "finds all volumes" do

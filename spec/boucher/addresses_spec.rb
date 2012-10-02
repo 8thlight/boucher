@@ -10,7 +10,7 @@ describe "Boucher Addresses" do
 
   after do
     Boucher::Servers.all.each { |s| s.destroy }
-    Boucher::Config[:env] = "dev"
+    Boucher::Config[:env] = "test"
   end
 
   it "does nothing for meal with no elastic ips" do
@@ -43,8 +43,8 @@ describe "Boucher Addresses" do
   end
 
   it "associates all ips for all meals" do
-    server1 = Boucher.compute.servers.create(tags: {"Meal" => "meal1", "Env" => "dev"})
-    server2 = Boucher.compute.servers.create(tags: {"Meal" => "meal2", "Env" => "dev"})
+    server1 = Boucher.compute.servers.create(tags: {"Meal" => "meal1", "Env" => "test"})
+    server2 = Boucher.compute.servers.create(tags: {"Meal" => "meal2", "Env" => "test"})
     ip1 = Boucher.compute.addresses.create
     ip2 = Boucher.compute.addresses.create
 
