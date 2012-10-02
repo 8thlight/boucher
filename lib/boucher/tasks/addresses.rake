@@ -4,7 +4,7 @@ namespace :addresses do
 
   desc "Prints a list of allocated Elastic IP addresses"
   task :list do
-    Boucher.print_addresses(Boucher.compute.addresses)
+    Boucher.print_address_overview(Boucher.address_overview)
   end
 
   desc "Allocates a new Elastic IP address"
@@ -23,13 +23,19 @@ namespace :addresses do
     puts "Done."
   end
 
-  desc "Associates Elastic IP addresses configured for the specified meal"
+  desc "Associates an Elastic IP with a specific server"
   task :associate, [:ip, :server_id] do |t, args|
+    server = Boucher.compute.servers.get(args.server_id)
+    raise "Server not found!" unless server
+    address = Boucher.compute.addresses.get(args.ip)
+    raise "Elastic IP not found!" unless address
+    address.server = server
+    Boucher.print_addresses [address]
   end
 
   desc "Associates all unbound Elastic IP addresses configured for all meals"
-  task :associate_all do
-
+  task :sync do
+    Boucher.associate_all_addresses
   end
 
 
