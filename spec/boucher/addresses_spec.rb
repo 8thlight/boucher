@@ -43,7 +43,6 @@ describe "Boucher Addresses" do
   end
 
   it "associates all ips for all meals" do
-    Boucher::IO.real!
     server1 = Boucher.compute.servers.create(tags: {"Meal" => "meal1", "Env" => "dev"})
     server2 = Boucher.compute.servers.create(tags: {"Meal" => "meal2", "Env" => "dev"})
     ip1 = Boucher.compute.addresses.create
