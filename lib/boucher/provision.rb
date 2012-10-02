@@ -2,6 +2,7 @@ require 'boucher/compute'
 require 'boucher/io'
 require 'boucher/servers'
 require 'boucher/volumes'
+require 'boucher/addresses'
 require 'retryable'
 
 module Boucher
@@ -41,22 +42,12 @@ module Boucher
     puts "\nThe new #{meal[:name]} server has been provisioned! id: #{server.id}"
   end
 
-  def self.attach_elastic_ips(meal, server)
-    puts "Attaching elastic IPs..."
-    ips = meal[:elastic_ips] || []
-
-    ips.each do |ip|
-      puts "Associating #{server.id} with #{ip}"
-      compute.associate_address(server.id, ip)
-    end
-  end
-
   private
 
   def self.cook_meal_on_server(meal, server)
     puts "Cooking meal '#{meal[:name]}' on server: #{server}"
     Boucher.cook_meal(server, meal[:name])
-    attach_elastic_ips(meal, server)
+    associate_addresses_for(meal, server)
   end
 
   def self.wait_for_server_to_accept_ssh(server)

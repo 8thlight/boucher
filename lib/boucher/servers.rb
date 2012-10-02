@@ -5,6 +5,10 @@ module Boucher
     NotFound = Class.new(StandardError)
 
     class << self
+      def clear
+        @instance = nil
+      end
+
       def instance
         reload if !@instance
         @instance
