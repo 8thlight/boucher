@@ -44,6 +44,13 @@ describe "Boucher::Servers" do
     Boucher::Servers.in_state("stopped").map(&:id).should == ["s1"]
   end
 
+  it "finds servers NOT in a given state" do
+    Boucher::Servers.in_state("!running").map(&:id).should == %w(s1 s2 s3)
+    Boucher::Servers.in_state("!terminated").map(&:id).should == %w(s1 s2 s4)
+    Boucher::Servers.in_state("!pending").map(&:id).should == %w(s1 s3 s4)
+    Boucher::Servers.in_state("!stopped").map(&:id).should == %w(s2 s3 s4)
+  end
+
   it "finds the first matching server" do
     Boucher::Servers.find.id.should == "s1"
     Boucher::Servers.find(:meal => "foo").id.should == "s1"
@@ -73,7 +80,8 @@ describe "Boucher::Servers" do
   end
 
   it "stops a server" do
-    Boucher.should_receive(:change_server_state).with("the id", :stop, "stopped")
-    Boucher::Servers.stop("the id")
+    server = OpenStruct.new(:id => "the id")
+    Boucher.should_receive(:change_servers_state).with([server], :stop, "stopped")
+    Boucher::Servers.stop([server])
   end
 end

@@ -54,19 +54,4 @@ module Boucher
   rescue Exception => e
     false
   end
-
-  def self.change_server_state(server_id, command, new_state)
-    print "#{command}-ing server #{server_id}..."
-    server = Boucher::Servers.with_id(server_id)
-    server.send(command.to_sym)
-    server.wait_for { print "."; state == new_state }
-    puts
-    Boucher.print_servers [server]
-    puts
-    puts "The server has been #{command}-ed."
-  end
-
-  def self.find_servers
-    compute.servers
-  end
 end

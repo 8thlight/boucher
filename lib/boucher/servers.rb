@@ -87,32 +87,28 @@ module Boucher
     end
 
     def in_state(state)
-      Servers.cultivate(self.find_all { |s| s.state == state.to_s })
+      if state[0] == "!"
+        state = state[1..-1]
+        Servers.cultivate(self.find_all { |s| s.state != state.to_s })
+      else
+        Servers.cultivate(self.find_all { |s| s.state == state.to_s })
+      end
     end
 
     def of_meal(meal)
       Servers.cultivate(self.find_all { |s| s.tags["Meal"] == meal.to_s })
     end
 
-    def self.start(server_id)
-      Boucher.change_server_state(server_id, :start, "running")
+    def self.start(servers)
+      Boucher.change_servers_state(servers, :start, "running")
     end
 
-    def self.stop(server_id)
-      Boucher.change_server_state(server_id, :stop, "stopped")
+    def self.stop(servers)
+      Boucher.change_servers_state(servers, :stop, "stopped")
     end
 
-    def self.terminate(server)
-      volumes = server.volumes
-      volumes_to_destroy = volumes.select { |v| !v.delete_on_termination }
-
-      Boucher.change_server_state server.id, :destroy, "terminated"
-
-      volumes_to_destroy.each do |volume|
-        volume.wait_for { volume.state == 'available' }
-        puts "Destroying volume #{volume.id}..."
-        Boucher::Volumes.destroy(volume)
-      end
+    def self.terminate(servers)
+      Boucher.change_servers_state(servers, :destroy, "terminated")
     end
 
     def with_id(server_id)
@@ -122,5 +118,15 @@ module Boucher
     def [](meal)
       find(:env => Boucher::Config[:env], :meal => meal, :state => "running")
     end
+  end
+
+  def self.change_servers_state(servers, command, new_state)
+    print "#{command}-ing servers #{servers.map(&:id).join(", ")}..."
+    servers.each { |s| s.send(command.to_sym) }
+    servers.each { |s| s.wait_for { print "."; s.state == new_state }}
+    puts
+    Boucher.print_servers servers
+    puts
+    puts "The servers have been #{command}-ed."
   end
 end

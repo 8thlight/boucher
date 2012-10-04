@@ -23,7 +23,7 @@ describe "Boucher Provisioning" do
       server = mock(:id => "the id", :state => "stopped")
       meal = {:name => "some_meal"}
       Boucher.stub(:meal).and_return(meal)
-      Boucher.should_receive(:change_server_state).with("the id", :start, "running")
+      Boucher.should_receive(:change_servers_state).with([server], :start, "running")
       server.should_receive(:reload)
       Boucher.should_receive(:cook_meal_on_server).with(meal, server)
 

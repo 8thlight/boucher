@@ -44,17 +44,12 @@ namespace :servers do
     server_listing("of meal '#{args.meal}'", Boucher::Servers.of_meal(args.meal))
   end
 
-  desc "Terminates the specified server"
-  task :terminate, [:server_id] do |t, args|
-    server = Boucher::Servers.with_id(args.server_id)
-
-    if !server
-      puts "Server #{args.server_id} does not exist"
-      exit 1
-    end
+  desc "Terminates the specified server(s)"
+  task :terminate, [:id_or_meal] do |t, args|
+    servers = Boucher.resolve_servers(args.id_or_meal)
 
     begin
-      Boucher::Servers.terminate(server)
+      Boucher::Servers.terminate(servers)
     rescue => e
       puts "\nTermination failed. This may be due to termination protection. If
 you're sure you wish to disable this protection, select the instance in the AWS
@@ -63,16 +58,16 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
     end
   end
 
-  desc "Stops the specified server"
-  task :stop, [:server_id] do |t, args|
-    server = Boucher.compute.servers.get(args.server_id)
-    Boucher::Servers.stop(args.server_id)
+  desc "Stops the specified server(s)"
+  task :stop, [:id_or_meal] do |t, args|
+    servers = Boucher.resolve_servers(args.id_or_meal)
+    Boucher::Servers.stop(servers) if !servers.empty?
   end
 
-  desc "Starts the specified server"
-  task :start, [:server_id] do |t, args|
-    Boucher::Servers.start(args.server_id)
-    server = Boucher.compute.servers.get(args.server_id)
+  desc "Starts the specified server(s)"
+  task :start, [:id_or_meal] do |t, args|
+    servers = Boucher.resolve_servers(args.id_or_meal)
+    Boucher::Servers.start(servers) if !servers.empty?
   end
 
   desc "Open an SSH session with the specified server"
@@ -113,14 +108,7 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   desc "Cook the specified meal on the instance(s) specified by the given id or meal"
   task :chef, [:meal, :server_id] do |t, args|
     Boucher.assert_env!
-    servers = []
-    if(args.server_id)
-      servers = [Boucher.compute.servers.get(args.server_id)]
-    else
-      puts "Searching for running #{args.meal} servers in #{Boucher.env_name} environment..."
-      servers = Boucher::Servers.search(:meal => args.meal, :env => Boucher.env_name, :state => "running")
-      puts "Found #{servers.size}."
-    end
+    servers = resolve_servers(args.server_id || args.meal)
     servers.each do |server|
       Boucher.cook_meal(server, args.meal)
     end

@@ -24,7 +24,7 @@ module Boucher
     if server.nil?
       Boucher.provision(meal)
     elsif server.state == "stopped"
-      Boucher::Servers.start(server.id)
+      Boucher::Servers.start([server])
       server.reload
       Boucher.cook_meal_on_server(meal, server)
     else
