@@ -49,7 +49,7 @@ namespace :servers do
     servers = Boucher.resolve_servers(args.id_or_meal)
 
     begin
-      Boucher::Servers.terminate(servers)
+      Boucher::Servers.terminate(servers) if !servers.empty?
     rescue => e
       puts "\nTermination failed. This may be due to termination protection. If
 you're sure you wish to disable this protection, select the instance in the AWS
@@ -68,6 +68,12 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   task :start, [:id_or_meal] do |t, args|
     servers = Boucher.resolve_servers(args.id_or_meal)
     Boucher::Servers.start(servers) if !servers.empty?
+  end
+
+  desc "Restarts the specified server(s)"
+  task :restart, [:id_or_meal] do |t, args|
+    servers = Boucher.resolve_servers(args.id_or_meal)
+    Boucher::Servers.restart(servers) if !servers.empty?
   end
 
   desc "Open an SSH session with the specified server"

@@ -107,6 +107,11 @@ module Boucher
       Boucher.change_servers_state(servers, :stop, "stopped")
     end
 
+    def self.restart(servers)
+      Boucher.change_servers_state(servers, :stop, "stopped")
+      Boucher.change_servers_state(servers, :start, "running")
+    end
+
     def self.terminate(servers)
       Boucher.change_servers_state(servers, :destroy, "terminated")
     end
