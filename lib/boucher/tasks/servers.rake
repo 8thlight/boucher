@@ -110,7 +110,7 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
     Boucher.establish_server(server, args.meal)
   end
 
-  desc "Cook the specified meal on the instance specified, or deployed instances of that meal"
+  desc "Cook the specified meal on the instance(s) specified by the given id or meal"
   task :chef, [:meal, :server_id] do |t, args|
     Boucher.assert_env!
     servers = []

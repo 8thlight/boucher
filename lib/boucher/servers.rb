@@ -1,6 +1,37 @@
 require 'boucher/compute'
 
 module Boucher
+
+  SERVER_TABLE_FORMAT = "%-12s  %-12s  %-10s  %-10s  %-10s  %-15s  %-15s %-10s\n"
+
+  def self.print_server_table_header
+    puts
+    printf SERVER_TABLE_FORMAT, "ID", "Environment", "Meal", "Creator", "State", "Public IP", "Private IP", "Inst. Size"
+    puts ("-" * 120)
+  end
+
+  def self.print_server(server)
+    printf SERVER_TABLE_FORMAT,
+           server.id,
+           (server.tags["Env"] || "???")[0...12],
+           (server.tags["Meal"] || "???")[0...10],
+           (server.tags["Creator"] || "???")[0...10],
+           server.state,
+           server.public_ip_address,
+           server.private_ip_address,
+           server.flavor_id
+  end
+
+  def self.print_servers(servers)
+    print_server_table_header
+    sorted_servers = servers.sort_by { |s| [s.tags["Env"] || "?",
+                                            s.tags["Meal"] || "?"] }
+    sorted_servers.each do |server|
+      print_server(server) if server
+    end
+    puts
+  end
+
   module Servers
     NotFound = Class.new(StandardError)
 
@@ -52,15 +83,15 @@ module Boucher
     end
 
     def in_env(env)
-      Servers.cultivate(self.find_all {|s| s.tags["Env"] == env.to_s })
+      Servers.cultivate(self.find_all { |s| s.tags["Env"] == env.to_s })
     end
 
     def in_state(state)
-      Servers.cultivate(self.find_all {|s| s.state == state.to_s })
+      Servers.cultivate(self.find_all { |s| s.state == state.to_s })
     end
 
     def of_meal(meal)
-      Servers.cultivate(self.find_all {|s| s.tags["Meal"] == meal.to_s })
+      Servers.cultivate(self.find_all { |s| s.tags["Meal"] == meal.to_s })
     end
 
     def self.start(server_id)
@@ -73,7 +104,7 @@ module Boucher
 
     def self.terminate(server)
       volumes = server.volumes
-      volumes_to_destroy = volumes.select {|v| !v.delete_on_termination}
+      volumes_to_destroy = volumes.select { |v| !v.delete_on_termination }
 
       Boucher.change_server_state server.id, :destroy, "terminated"
 
@@ -85,7 +116,7 @@ module Boucher
     end
 
     def with_id(server_id)
-      Servers.cultivate(self.find_all {|s| s.id == server_id}).first
+      Servers.cultivate(self.find_all { |s| s.id == server_id }).first
     end
 
     def [](meal)

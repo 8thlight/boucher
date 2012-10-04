@@ -15,11 +15,35 @@ module Boucher
     @store
   end
 
+  FILE_TABLE_FORMAT = "%-60s  %-10s  %-25s  %-32s\n"
+
+  def self.print_file_table_header
+    puts
+    printf FILE_TABLE_FORMAT, "Key", "Size", "Last Modified", "etag"
+    puts ("-" * 150)
+  end
+
+  def self.print_file(file)
+    printf FILE_TABLE_FORMAT,
+           file.key,
+           file.content_length,
+           file.last_modified,
+           file.etag
+  end
+
+  def self.print_files(files)
+    print_file_table_header
+    files.each do |file|
+      print_file(file) if file
+    end
+    puts
+  end
+
   module Storage
 
     def self.list(dir_name)
       dir = Boucher.storage.directories.get(dir_name)
-      result = dir.files.select {|f| f.key[-1] != "/" }.to_a
+      result = dir.files.select { |f| f.key[-1] != "/" }.to_a
       result
     end
 
@@ -36,7 +60,7 @@ module Boucher
       dir = Boucher.storage.directories.get(dir_name)
       url = dir.files.get_https_url(key, Time.now + 3600)
       Kernel.system("curl", url, "-o", filename)
-      dir.files.detect{|f| f.key == key}
+      dir.files.detect { |f| f.key == key }
     end
 
   end

@@ -34,7 +34,7 @@ namespace :addresses do
   end
 
   desc "Associates all unbound Elastic IP addresses configured for all meals"
-  task :sync do
+  task :push do
     Boucher.associate_all_addresses
   end
 
