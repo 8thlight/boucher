@@ -57,7 +57,7 @@ module Boucher
 
   def self.change_server_state(server_id, command, new_state)
     print "#{command}-ing server #{server_id}..."
-    server = compute.servers.get(server_id)
+    server = Boucher::Servers.with_id(server_id)
     server.send(command.to_sym)
     server.wait_for { print "."; state == new_state }
     puts
