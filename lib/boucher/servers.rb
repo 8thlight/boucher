@@ -7,7 +7,7 @@ module Boucher
   def self.print_server_table_header
     puts
     printf SERVER_TABLE_FORMAT, "ID", "Environment", "Meal", "Creator", "State", "Public IP", "Private IP", "Inst. Size"
-    puts ("-" * 120)
+    puts ("-" * 107)
   end
 
   def self.print_server(server)
@@ -133,5 +133,17 @@ module Boucher
     Boucher.print_servers servers
     puts
     puts "The servers have been #{command}-ed."
+  end
+
+  def self.resolve_servers(id_or_meal)
+    if id_or_meal[0..1] == "i-"
+      puts "Retrieving server with id #{id_or_meal}..."
+      [Boucher::Servers.with_id(id_or_meal)]
+    else
+      puts "Searching for running #{id_or_meal} servers in #{Boucher.env_name} environment..."
+      servers = Boucher::Servers.search(:meal => id_or_meal, :env => Boucher.env_name, :state => "!terminated")
+      Boucher::print_servers(servers)
+      servers
+    end
   end
 end

@@ -5,7 +5,7 @@ module Boucher
   } unless defined?(Boucher::Config)
 
   def self.env_name
-    ENV["BENV"] ? ENV["BENV"] : :dev
+    Boucher::Config[:env] || ENV["BENV"] || :dev
   end
 
   env_dir = File.expand_path("config/env")
