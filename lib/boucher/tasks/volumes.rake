@@ -12,7 +12,8 @@ namespace :volumes do
     volume = Boucher::Volumes.with_id(args.volume_id)
     if volume
       puts "Destroying volume:"
-      print_volumes [volume]
+      Boucher.print_volumes [volume]
+      volume.destroy
     else
       raise "Volume not found: #{args.volume_id}"
     end

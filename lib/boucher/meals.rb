@@ -42,7 +42,6 @@ module Boucher
     server.tags["CreatedAt"] = Time.new.strftime("%Y%m%d%H%M%S")
     server.tags["Creator"] = current_user
     server.tags["Env"] = Boucher::Config[:env]
-    server.tags["Volumes"] = meal[:volumes]
   end
 
 end
