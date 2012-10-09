@@ -78,7 +78,7 @@ module Boucher
       ips = meal[:elastic_ips]
       if ips && ips.size > 0
         begin
-          server = Boucher::Servers.find(meal: name, env: Boucher::Config[:env])
+          server = Boucher::Servers[name]
           associate_addresses_for(meal, server)
         rescue Boucher::Servers::NotFound => e
           puts "Can't associate address to '#{name}' server because it can't be found."
