@@ -47,4 +47,5 @@ describe "Boucher::Volumes" do
     new_volume.size.should == 12
     new_volume.availability_zone.should == "us-east-1c"
   end
+
 end

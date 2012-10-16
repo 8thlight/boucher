@@ -117,7 +117,7 @@ module Boucher
     end
 
     def with_id(server_id)
-      Servers.cultivate(self.find_all { |s| s.id == server_id }).first
+      Servers.cultivate(self.all.find_all { |s| s.id == server_id }).first
     end
 
     def [](meal)

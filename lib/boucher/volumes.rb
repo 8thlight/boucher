@@ -1,20 +1,21 @@
 require 'boucher/compute'
+require 'boucher/servers'
 
 module Boucher
 
-  VOLUME_TABLE_FORMAT = "%-12s  %-15s  %-6s  %-10s  %-10s  %-13s\n"
+  VOLUME_TABLE_FORMAT = "%-12s  %-6s  %-10s  %-12s %-10s  %-13s\n"
 
   def self.print_volumes(volumes)
     puts
-    printf VOLUME_TABLE_FORMAT, "ID", "Name", "Size", "Server", "State", "Snapshot"
-    puts ("-" * 76)
+    printf VOLUME_TABLE_FORMAT, "ID", "Size", "Server", "Device", "State", "Snapshot"
+    puts ("-" * 75)
 
     volumes.each do |volume|
       printf VOLUME_TABLE_FORMAT,
              volume.id,
-             (volume.tags["Name"] || "")[0...15],
              volume.size.to_s + "GB",
              volume.server_id,
+             volume.device,
              volume.state,
              volume.snapshot_id
     end
