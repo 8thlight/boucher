@@ -42,5 +42,23 @@ describe "Boucher Security Groups" do
     }
   end
 
-
+  it "creates a security group according to configuration" do
+    configuration = {
+      name: "group",
+      description: "group description",
+      ip_permissions: [
+        {
+          from_port: 10,
+          to_port: 11,
+          protocol: "myprotocol",
+          incomingIP: "12345"
+        }
+      ]
+    }
+    fog_arguments=nil
+    security_groups = mock
+    Boucher.compute.stub(:security_groups).and_return(security_groups)
+    security_groups.should_receive(:new).with(fog_arguments)
+    security_groups.should_receive(:save)
+  end
 end
