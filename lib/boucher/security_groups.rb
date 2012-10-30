@@ -3,10 +3,19 @@ require 'boucher/compute'
 module Boucher
 
   module SecurityGroups
+    SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-10s  %-50s\n"
 
     module Printing
-      def print_table(security_groups)
-        #p "HELLO"
+      def self.print_table(security_groups, servers_for_groups)
+        printf SECURITY_GROUP_TABLE_FORMAT, "ID", "Name", "Environment", "Servers"
+        puts
+        security_groups.each do |security_group|
+          printf SECURITY_GROUP_TABLE_FORMAT,
+            security_group.group_id,
+            security_group.name,
+            "????",
+            servers_for_groups[security_group.name].map(&:id)
+        end
       end
     end
 

@@ -4,7 +4,6 @@ require 'boucher/security_groups'
 describe "Boucher Security Groups" do
 
   it "finds all security groups" do
-    zz = Fog::Compute::AWS::SecurityGroup
     first_security_group = Fog::Compute::AWS::SecurityGroup.new
     second_security_group = Fog::Compute::AWS::SecurityGroup.new
 
