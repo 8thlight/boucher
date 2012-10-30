@@ -3,6 +3,7 @@ require 'boucher/io'
 require 'boucher/servers'
 require 'boucher/volumes'
 require 'boucher/addresses'
+require 'boucher/security_groups'
 require 'retryable'
 
 module Boucher
@@ -65,6 +66,7 @@ module Boucher
 
   def self.create_meal_server(meal)
     server = compute.servers.new(:tags => {})
+
     Boucher.setup_meal(server, meal)
     server.save
     Boucher.print_servers([server])

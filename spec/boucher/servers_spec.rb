@@ -37,6 +37,17 @@ describe "Boucher::Servers" do
     Boucher::Servers.in_env("dev").map(&:id).should == ["s3", "s4"]
   end
 
+  it "finds servers with a given security group" do
+    Boucher::Servers.clear
+    remote_servers.each do |s|
+      s.groups = []
+    end
+    remote_servers.first.groups = ["test"]
+
+    Boucher::Servers.with_group("blah").should == []
+    Boucher::Servers.with_group("test").map(&:id).should == ["s1"]
+  end
+
   it "finds servers in a given state" do
     Boucher::Servers.in_state("running").map(&:id).should == ["s4"]
     Boucher::Servers.in_state("terminated").map(&:id).should == ["s3"]

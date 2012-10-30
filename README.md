@@ -30,6 +30,8 @@ You'll probably want to create a repository for your own to track the work here.
 
 Read config/env/shared.rb to get a feel for the configuration options.  You'll fill in some of those values as you continue to get started below.
 
+You will also need to create a security groups yaml file in order to use the security groups functionality.  The security\_groups.example.yml file should get you off the ground.
+
 ### Creating a base image
 
 1) Launch new instance: Ubuntu Server 12.04.1 LTS

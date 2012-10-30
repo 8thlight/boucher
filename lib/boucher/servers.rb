@@ -51,7 +51,7 @@ module Boucher
         cultivate(@instance)
       end
 
-      %w{all of_meal in_env in_state search find [] with_id}.each do |m|
+      %w{all of_meal with_group in_env in_state search find [] with_id}.each do |m|
         module_eval "def #{m}(*args); instance.#{m}(*args); end"
       end
 
@@ -84,6 +84,12 @@ module Boucher
 
     def in_env(env)
       Servers.cultivate(self.find_all { |s| s.tags["Env"] == env.to_s })
+    end
+
+    def with_group(group)
+      Servers.cultivate(self.find_all { |s|
+        s.groups.include? group
+      })
     end
 
     def in_state(state)

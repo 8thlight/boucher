@@ -21,5 +21,4 @@ module Boucher
       puts *args
     end
   end
-
 end
