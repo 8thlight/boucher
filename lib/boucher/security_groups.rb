@@ -43,15 +43,26 @@ module Boucher
         new_configuration
       end
 
+      def colliding_configuration(configuration)
+        all.find do |security_group|
+          security_group.name == configuration[:name]
+        end
+      end
+
       def build_for_configuration(configuration)
-        all.new(transform_configuration(configuration))
+        colliding_configuration = colliding_configuration(configuration)
+        if colliding_configuration
+          new_group = colliding_configuration.merge_attributes(configuration)
+        else
+          new_group = all.new(transform_configuration(configuration))
+        end
+        new_group.save
       end
 
       def build_for_configurations(configurations)
         configurations.each do |configuration|
-          all.new(transform_configuration(configuration))
+          build_for_configuration(configuration)
         end
-        all.save
       end
 
       def servers_for_groups

@@ -72,9 +72,11 @@ describe "Boucher Security Groups" do
         }
       ]
     }
-    security_groups = mock
-    Boucher::SecurityGroups.stub(:all).and_return(security_groups)
-    security_groups.should_receive(:new).with(fog_arguments)
+    security_groups = mock(find: nil)
+    new_group = mock
+    Boucher.compute.stub(:security_groups).and_return(security_groups)
+    security_groups.should_receive(:new).with(fog_arguments).and_return(new_group)
+    new_group.should_receive(:save)
     Boucher::SecurityGroups.build_for_configuration(configuration)
   end
 
@@ -107,12 +109,48 @@ describe "Boucher Security Groups" do
     }
     configurations = [configuration, configuration, configuration]
     transformed_configurations = [fog_arguments, fog_arguments, fog_arguments]
-    security_groups = mock
-    Boucher::SecurityGroups.stub(:all).and_return(security_groups)
-    security_groups.should_receive(:new).with(fog_arguments)
-    security_groups.should_receive(:new).with(fog_arguments)
-    security_groups.should_receive(:new).with(fog_arguments)
-    security_groups.should_receive(:save)
+    security_groups = mock(find: nil)
+    Boucher.compute.stub(:security_groups).and_return(security_groups)
+    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
+    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
+    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
     Boucher::SecurityGroups.build_for_configurations(configurations)
+  end
+
+  it "updates existing security groups" do
+    groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
+    Boucher.compute.stub(:security_groups).and_return(groups)
+    non_colliding_configuration = {
+      name: "group",
+      description: "group description",
+      ip_permissions: [
+        {
+          groups: [],
+          from_port: 10,
+          to_port: 11,
+          protocol: "myprotocol",
+          incomingIPs: ["12345", "1999"]
+        }
+      ]
+    }
+    colliding_configuration = {
+      name: "exists",
+      description: "group description",
+      ip_permissions: [
+        {
+          groups: [],
+          from_port: 10,
+          to_port: 11,
+          protocol: "myprotocol",
+          incomingIPs: ["12345", "1999"]
+        }
+      ]
+    }
+    configurations = [non_colliding_configuration, colliding_configuration]
+    groups.should_receive(:new).and_return(stub(:save => nil))
+    groups.first.should_receive(:merge_attributes).and_return(stub(:save => nil))
+
+    Boucher::SecurityGroups.build_for_configurations(configurations)
+
   end
 end
