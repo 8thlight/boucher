@@ -155,10 +155,13 @@ describe "Boucher Security Groups" do
 
   it "associates security groups and servers" do
     server_security_group_mapping = {
-      "i-1" => ["first"]
+      "irc" => ["first"]
     }
-    first_server = mock(id: "i-1")
+    first_server = mock(name: "irc")
     first_server.should_receive(:groups=).with(["first"])
+    first_server.should_receive(:save)
+    second_server = mock(name: "artisan")
+    Boucher::Servers.stub(:all).and_return([first_server, second_server])
 
     Boucher::SecurityGroups.associate_servers(server_security_group_mapping)
   end

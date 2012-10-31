@@ -73,6 +73,14 @@ module Boucher
       end
 
       def associate_servers(server_mapping)
+        servers = Boucher::Servers.all
+        servers.each do |s|
+          groups = server_mapping[s.name]
+          if groups
+            s.groups = groups
+            s.save
+          end
+        end
       end
     end
   end
