@@ -1,4 +1,5 @@
 require 'boucher/compute'
+require 'boucher/servers'
 
 module Boucher
 
@@ -22,6 +23,35 @@ module Boucher
     class << self
       def all
         Boucher.compute.security_groups
+      end
+
+      def transform_configuration(configuration)
+        new_configuration = {}
+        new_configuration[:name] = configuration[:name]
+        new_configuration[:description] = configuration[:description]
+        new_configuration[:ip_permissions] = configuration[:ip_permissions].map do |permission|
+          new_permission = {}
+          new_permission[:groups] = permission[:groups]
+          new_permission[:from_port] = permission[:from_port]
+          new_permission[:to_port] = permission[:to_port]
+          new_permission[:ipProtocol] = permission[:protocol]
+          new_permission[:ipRanges] = permission[:incomingIPs].map do |ip|
+            {cidrIp: ip}
+          end
+          new_permission
+        end
+        new_configuration
+      end
+
+      def build_for_configuration(configuration)
+        all.new(transform_configuration(configuration))
+      end
+
+      def build_for_configurations(configurations)
+        configurations.each do |configuration|
+          all.new(transform_configuration(configuration))
+        end
+        all.save
       end
 
       def servers_for_groups
