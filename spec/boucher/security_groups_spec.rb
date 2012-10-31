@@ -151,6 +151,15 @@ describe "Boucher Security Groups" do
     groups.first.should_receive(:merge_attributes).and_return(stub(:save => nil))
 
     Boucher::SecurityGroups.build_for_configurations(configurations)
+  end
 
+  it "associates security groups and servers" do
+    server_security_group_mapping = {
+      "i-1" => ["first"]
+    }
+    first_server = mock(id: "i-1")
+    first_server.should_receive(:groups=).with(["first"])
+
+    Boucher::SecurityGroups.associate_servers(server_security_group_mapping)
   end
 end

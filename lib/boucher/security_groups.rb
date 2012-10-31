@@ -71,6 +71,9 @@ module Boucher
           memo
         end
       end
+
+      def associate_servers(server_mapping)
+      end
     end
   end
 end
