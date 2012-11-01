@@ -20,6 +20,7 @@ describe "Boucher::snapshots" do
     end
 
     it "finds all snapshots" do
+      Boucher::Snapshots.instance_variable_set(:@snapshots, nil)
       Boucher::Snapshots.all.size.should == 3
       Boucher::Snapshots.all.should == remote_snapshots
     end

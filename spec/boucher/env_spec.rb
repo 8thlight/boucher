@@ -11,6 +11,7 @@ describe "Environment" do
     end
 
     it "defaults to :dev" do
+      Boucher::Config.delete(:env)
       ENV.delete('BENV')
       #load File.expand_path(File.dirname(__FILE__) + "/../../lib/boucher/env.rb")
       Boucher::env_name.should == :dev
