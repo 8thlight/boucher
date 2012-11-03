@@ -80,7 +80,7 @@ describe "Boucher Security Groups" do
         }
       ]
     }
-    security_groups = mock(find: nil)
+    security_groups = mock(get: nil)
     new_group = mock
     Boucher.compute.stub(:security_groups).and_return(security_groups)
     security_groups.should_receive(:new).with(fog_arguments).and_return(new_group)
@@ -117,7 +117,7 @@ describe "Boucher Security Groups" do
     }
     configurations = [configuration, configuration, configuration]
     transformed_configurations = [fog_arguments, fog_arguments, fog_arguments]
-    security_groups = mock(find: nil)
+    security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
     security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
     security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
@@ -127,6 +127,8 @@ describe "Boucher Security Groups" do
 
   it "updates existing security groups and builds a new group for not-existing ones" do
     groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
+    groups.stub(:get)
+    groups.stub(:get).with("exists").and_return(groups.first)
     Boucher.compute.stub(:security_groups).and_return(groups)
     non_colliding_configuration = {
       name: "group",
@@ -158,9 +160,13 @@ describe "Boucher Security Groups" do
     transformed_non_collliding_config = Boucher::SecurityGroups.transform_configuration non_colliding_configuration
 
     configurations = [non_colliding_configuration, colliding_configuration]
+
     groups.first.should_receive(:merge_attributes)
                 .with(transformed_colliding_config)
-                .and_return(stub save: nil)
+                .and_return(nil)
+    groups.first.should_receive(:destroy)
+    groups.first.should_receive(:save)
+
     groups.should_receive(:new)
                 .with(transformed_non_collliding_config)
                 .and_return(stub save: nil)

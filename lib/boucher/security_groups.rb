@@ -54,20 +54,19 @@ module Boucher
       end
 
       def colliding_configuration(configuration)
-        all.find do |security_group|
-          security_group.name == configuration[:name]
-        end
+        all.get(configuration[:name])
       end
 
       def build_for_configuration(configuration)
         transformed_configuration = transform_configuration(configuration)
         colliding_configuration = colliding_configuration(configuration)
         if colliding_configuration
-          new_group = colliding_configuration.merge_attributes(transformed_configuration)
+          colliding_configuration.merge_attributes(transformed_configuration)
+          colliding_configuration.destroy
+          colliding_configuration.save
         else
-          new_group = all.new(transformed_configuration)
+          all.new(transformed_configuration).save
         end
-        new_group.save
       end
 
       def build_for_configurations(configurations)
