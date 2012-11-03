@@ -1,4 +1,4 @@
-<img src="https://raw.github.com/8thlight/boucher/master/boucher_logo.png" alt="Boucher logo" title="Boucher" align="right"/>
+<img src="https://raw.github.com/8thlight/boucher/master/boucher_logo.jpg" alt="Boucher logo" title="Boucher" align="right"/>
 # Boucher
 
 Boucher, pronounced [boo-shay], and meaning Butcher in French, is a suite of Rake tasks that simplfy your AWS
