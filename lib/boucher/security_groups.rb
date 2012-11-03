@@ -4,19 +4,24 @@ require 'boucher/servers'
 module Boucher
 
   module SecurityGroups
-    SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-10s  %-50s\n"
+    SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-50s\n"
 
     module Printing
       def self.print_table(security_groups, servers_for_groups)
-        printf SECURITY_GROUP_TABLE_FORMAT, "ID", "Name", "Environment", "Servers"
+        printf SECURITY_GROUP_TABLE_FORMAT, "ID", "Name", "Servers"
         puts
         security_groups.each do |security_group|
           printf SECURITY_GROUP_TABLE_FORMAT,
             security_group.group_id,
             security_group.name,
-            "????",
-            servers_for_groups[security_group.name].map(&:id)
+            server_names(servers_for_groups[security_group.name])
         end
+      end
+
+      def self.server_names(servers)
+        servers.map { |server|
+          "#{server.id}(#{server.tags['Meal']})"
+        }.join(', ')
       end
     end
 
@@ -36,11 +41,16 @@ module Boucher
           new_permission[:to_port] = permission[:to_port]
           new_permission[:ipProtocol] = permission[:protocol]
           new_permission[:ipRanges] = permission[:incomingIPs].map do |ip|
-            {cidrIp: ip}
+            {cidrIp: transform_ip(ip)}
           end
           new_permission
         end
         new_configuration
+      end
+
+      def transform_ip(ip)
+        appendix = (ip == "0.0.0.0") ? 0 : 32
+        "#{ip}/#{appendix}"
       end
 
       def colliding_configuration(configuration)
@@ -50,11 +60,12 @@ module Boucher
       end
 
       def build_for_configuration(configuration)
+        transformed_configuration = transform_configuration(configuration)
         colliding_configuration = colliding_configuration(configuration)
         if colliding_configuration
-          new_group = colliding_configuration.merge_attributes(configuration)
+          new_group = colliding_configuration.merge_attributes(transformed_configuration)
         else
-          new_group = all.new(transform_configuration(configuration))
+          new_group = all.new(transformed_configuration)
         end
         new_group.save
       end

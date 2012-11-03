@@ -45,6 +45,14 @@ describe "Boucher Security Groups" do
     }
   end
 
+  it "transforms 'all-ips' by putting funny 0 on the end" do
+    Boucher::SecurityGroups.transform_ip("0.0.0.0").should == "0.0.0.0/0"
+  end
+
+  it "transforms other ip by putting funny 32 on the end" do
+    Boucher::SecurityGroups.transform_ip("0.2.0.0").should == "0.2.0.0/32"
+  end
+
   it "creates a security group according to configuration" do
     configuration = {
       name: "group",
@@ -55,7 +63,7 @@ describe "Boucher Security Groups" do
           from_port: 10,
           to_port: 11,
           protocol: "myprotocol",
-          incomingIPs: ["12345", "1999"]
+          incomingIPs: ["1.2.3.4.5"]
         }
       ]
     }
@@ -64,7 +72,7 @@ describe "Boucher Security Groups" do
       description: "group description",
       ip_permissions: [
         {
-          ipRanges: [{cidrIp: "12345"}, {cidrIp: "1999"}],
+          ipRanges: [{cidrIp: "1.2.3.4.5/32"}],
           groups: [],
           from_port: 10,
           to_port: 11,
@@ -99,7 +107,7 @@ describe "Boucher Security Groups" do
       description: "group description",
       ip_permissions: [
         {
-          ipRanges: [{cidrIp: "12345"}, {cidrIp: "1999"}],
+          ipRanges: [{cidrIp: "12345/32"}, {cidrIp: "1999/32"}],
           groups: [],
           from_port: 10,
           to_port: 11,
@@ -117,7 +125,7 @@ describe "Boucher Security Groups" do
     Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
-  it "updates existing security groups" do
+  it "updates existing security groups and builds a new group for not-existing ones" do
     groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
     Boucher.compute.stub(:security_groups).and_return(groups)
     non_colliding_configuration = {
@@ -146,9 +154,16 @@ describe "Boucher Security Groups" do
         }
       ]
     }
+    transformed_colliding_config = Boucher::SecurityGroups.transform_configuration colliding_configuration
+    transformed_non_collliding_config = Boucher::SecurityGroups.transform_configuration non_colliding_configuration
+
     configurations = [non_colliding_configuration, colliding_configuration]
-    groups.should_receive(:new).and_return(stub(:save => nil))
-    groups.first.should_receive(:merge_attributes).and_return(stub(:save => nil))
+    groups.first.should_receive(:merge_attributes)
+                .with(transformed_colliding_config)
+                .and_return(stub save: nil)
+    groups.should_receive(:new)
+                .with(transformed_non_collliding_config)
+                .and_return(stub save: nil)
 
     Boucher::SecurityGroups.build_for_configurations(configurations)
   end
