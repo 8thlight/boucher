@@ -1,6 +1,5 @@
 require_relative "../spec_helper"
 require 'boucher/security_groups'
-
 describe "Boucher Security Groups" do
   before :each do
     Fog::Compute.new({:provider => "AWS", :aws_access_key_id => "a", :aws_secret_access_key => "abc"})
@@ -178,10 +177,9 @@ describe "Boucher Security Groups" do
     server_security_group_mapping = {
       "irc" => ["first"]
     }
-    first_server = mock(name: "irc")
+    first_server = mock(tags: {"Name" => "irc"})
     first_server.should_receive(:groups=).with(["first"])
-    first_server.should_receive(:save)
-    second_server = mock(name: "artisan")
+    second_server = mock(tags: {"Name" => "artisan"})
     Boucher::Servers.stub(:all).and_return([first_server, second_server])
 
     Boucher::SecurityGroups.associate_servers(server_security_group_mapping)

@@ -85,10 +85,9 @@ module Boucher
       def associate_servers(server_mapping)
         servers = Boucher::Servers.all
         servers.each do |s|
-          groups = server_mapping[s.name]
+          groups = server_mapping[s.tags["Name"]]
           if groups
             s.groups = groups
-            s.save
           end
         end
       end
