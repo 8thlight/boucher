@@ -51,7 +51,7 @@ Read config/env/shared.rb to get a feel for the configuration options.  You'll f
 
     rake servers:ssh[<instance id>]
 
-5) Create new poweruser (unless you like 'unubutu' as your poweruser).
+5) Create new poweruser (unless you like 'ubuntu' as your poweruser).
 
     sudo adduser <username>
     sudo adduser <username> sudo
