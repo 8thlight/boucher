@@ -34,7 +34,8 @@ Read config/env/shared.rb to get a feel for the configuration options.  You'll f
 
 1) Launch new instance: Ubuntu Server 12.04.1 LTS
 
- * Create a new key saved in your infrastructure project
+ * Create a new keyfile (*.pem) saved in your infrastructure project
+ * `chmod 0600 KEYFILE_NAME.pem` in your infrastructure project
  * Be sure to add a security group that opens port 22 for SSH
 
 2) Update config/env/shared.rb
