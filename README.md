@@ -2,7 +2,7 @@
 # Boucher
 
 Boucher, pronounced [boo-shay], and meaning Butcher in French, is a suite of Rake tasks that simplfy your AWS
-deployment strategy.  It's built ontop of Chef and Fog giving your fingers the power to create new servers,
+deployment strategy.  It's built on top of Chef and Fog giving your fingers the power to create new servers,
 install required software, and deploy your system all in a single command.
 
 It also helps manage your system with support for different environments and tasks to:
@@ -26,9 +26,9 @@ that'll get you off the ground.  We recomend
     git clone git://github.com/8thlight/boucher_template.git infrastructure
     rm -rf infrastructure/.git
 
-You'll probabaly want to create a repository for your own to track the work here.
+You'll probably want to create a repository for your own to track the work here.
 
-Read config/env/shared.rb to get a feel for the configuration options.  You'll fill in some of those values as your continue to get started below.
+Read config/env/shared.rb to get a feel for the configuration options.  You'll fill in some of those values as you continue to get started below.
 
 ### Creating a base image
 
@@ -47,7 +47,7 @@ Read config/env/shared.rb to get a feel for the configuration options.  You'll f
 
     rake servers:list
 
-4) SSH into new server.  (:username config must be 'ubunutu' at this point)
+4) SSH into new server.  (:username config must be 'ubuntu' at this point)
 
     rake servers:ssh[<instance id>]
 
@@ -73,14 +73,14 @@ Read config/env/shared.rb to get a feel for the configuration options.  You'll f
     # add the following line at the end of the file:
     <username> ALL=(ALL) NOPASSWD: ALL
 
-9) Install required pacakges and gems.
+9) Install required packages and gems.
 
     sudo apt-get update
     sudo apt-get install ruby1.9.1 ruby1.9.1-dev git gcc make libxml2-dev libxslt1-dev
     sudo apt-get upgrade
     sudo gem install bundler chef
 
-10) Checkout your infrstructure repo.  (Yes.  You should push your repo even in this early stage.)
+10) Checkout your infrastructure repo.  (Yes.  You should push your repo even in this early stage.)
 If you use github, you'll have to generate ssh keys and add them to the github repo.
 
     cd ~/.ssh
@@ -104,9 +104,9 @@ Run rake to see the list of tasks provided.
 
 ### Meals
 
-We're sticking with the metephore here.  A Meal is basically a set of recipes for a single server.
+We're sticking with the metaphor here.  A Meal is basically a set of recipes for a single server.
 Boucher will expect meals to exist in the config directory.  They are JSON files usable by chef-solo, and Boucher
-allows you too add extra configuration information under the "Boucher": key.  For example:
+allows you to add extra configuration information under the "Boucher": key.  For example:
 
     {
       "run_list": [
@@ -125,7 +125,7 @@ allows you too add extra configuration information under the "Boucher": key.  Fo
 
 ### ERB in config
 
-Meal .json files may contain ERB in the "boucher" section.  However, the file get's parsed by chef-solo so it has to remain a valid JSON file.  But you can do things like this:
+Meal .json files may contain ERB in the "boucher" section.  However, the file gets parsed by chef-solo so it has to remain a valid JSON file.  But you can do things like this:
 
          {
            "run_list": ...
@@ -170,7 +170,7 @@ Environment configuration is available in your chef recipes.  Just require 'bouc
 
 ### Recipes
 
-We'll assume you're familiar with Chef.  So you know, there are plany of open source cookbooks/recipes on the intertubes.
+We'll assume you're familiar with Chef.  So you know, there are plenty of open source cookbooks/recipes on the intertubes.
 Convention is to grab the files, put them in your cookbooks folder and take ownership of them.  There's a good chance you'll
 want to change them.
 
