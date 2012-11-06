@@ -82,7 +82,8 @@ Read config/env/shared.rb to get a feel for the configuration options.  You'll f
     sudo gem install bundler chef
 
 10) Checkout your infrastructure repo.  (Yes.  You should push your repo even in this early stage.)
-If you use github, you'll have to generate ssh keys and add them to the github repo.
+If you use github, you'll have to generate ssh keys and add them to the github repo. Note: be sure
+you name the directory "infrastructure" when cloning, since boucher assumes that location.
 
     cd ~/.ssh
     ssh-keygen -t rsa -C "your_email@youremail.com"
