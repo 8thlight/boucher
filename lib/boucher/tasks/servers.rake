@@ -112,11 +112,19 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   end
 
   desc "Cook the specified meal on the instance(s) specified by the given id or meal"
-  task :chef, [:meal, :server_id] do |t, args|
+  task :meal, [:meal, :server_id] do |t, args|
     Boucher.assert_env!
     servers = Boucher.resolve_servers(args.server_id || args.meal)
     servers.each do |server|
       Boucher.cook_meal(server, args.meal)
+    end
+  end
+
+  desc "Cook the specified recipe on the instance(s) specified by the given id or meal"
+  task :recipe, [:recipe, :id_or_meal] do |t, args|
+    servers = Boucher.resolve_servers(args.id_or_meal || args.meal)
+    servers.each do |server|
+      Boucher.cook_recipe(server, args.recipe)
     end
   end
 end
