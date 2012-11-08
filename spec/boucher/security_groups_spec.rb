@@ -67,7 +67,7 @@ describe "Boucher Security Groups" do
     }
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    new_group = mock
+    new_group = mock(save: nil)
     expected_construction_args = {name: "group", description: "group description"}
     security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
@@ -88,7 +88,7 @@ describe "Boucher Security Groups" do
     }
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    new_group = mock
+    new_group = mock(save: nil)
     security_groups.stub(:new).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, group: "zanzibar")
     Boucher::SecurityGroups.build_for_configuration(configuration)
@@ -114,7 +114,7 @@ describe "Boucher Security Groups" do
     }
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    new_group = mock
+    new_group = mock(save: nil)
     expected_construction_args = {name: "group", description: "group description"}
     security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
@@ -138,14 +138,14 @@ describe "Boucher Security Groups" do
     configurations = [configuration, configuration, configuration]
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    security_groups.stub(:new).and_return(mock(authorize_port_range: nil))
+    security_groups.stub(:new).and_return(mock(authorize_port_range: nil, save: nil))
     security_groups.should_receive(:new).exactly(3).times
     Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
   it "destroys existing security groups and builds new ones over their graves" do
     groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
-    groups.stub(:new).and_return(stub(authorize_port_range: nil))
+    groups.stub(:new).and_return(stub(authorize_port_range: nil, save: nil))
     groups.stub(:get).with("exists").and_return(groups.first)
     Boucher.compute.stub(:security_groups).and_return(groups)
     colliding_configuration = {

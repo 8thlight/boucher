@@ -63,6 +63,7 @@ module Boucher
           group: permission[:group],
           ip_protocol: permission[:ip_protocol]
         }
+        group.save
         group.authorize_port_range(range, compact_hash(options))
       end
 
