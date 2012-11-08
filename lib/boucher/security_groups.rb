@@ -2,7 +2,6 @@ require 'boucher/compute'
 require 'boucher/servers'
 
 module Boucher
-
   module SecurityGroups
     SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-50s\n"
 
@@ -30,24 +29,6 @@ module Boucher
         Boucher.compute.security_groups
       end
 
-      def transform_configuration(configuration)
-        new_configuration = {}
-        new_configuration[:name] = configuration[:name]
-        new_configuration[:description] = configuration[:description]
-        new_configuration[:ip_permissions] = configuration[:ip_permissions].map do |permission|
-          new_permission = {}
-          new_permission[:groups] = permission[:groups]
-          new_permission[:from_port] = permission[:from_port]
-          new_permission[:to_port] = permission[:to_port]
-          new_permission[:ipProtocol] = permission[:protocol]
-          new_permission[:ipRanges] = permission[:incomingIPs].map do |ip|
-            {cidrIp: transform_ip(ip)}
-          end
-          new_permission
-        end
-        new_configuration
-      end
-
       def transform_ip(ip)
         appendix = (ip == "0.0.0.0") ? 0 : 32
         "#{ip}/#{appendix}"
@@ -58,14 +39,36 @@ module Boucher
       end
 
       def build_for_configuration(configuration)
-        transformed_configuration = transform_configuration(configuration)
-        colliding_configuration = colliding_configuration(configuration)
-        if colliding_configuration
-          colliding_configuration.merge_attributes(transformed_configuration)
-          colliding_configuration.destroy
-          colliding_configuration.save
-        else
-          all.new(transformed_configuration).save
+        destroy_existing_configuration(configuration)
+        group = all.new(
+          name: configuration[:name],
+          description: configuration[:description]
+        )
+
+        configuration[:ip_permissions].each do |permission|
+          authorize(group, permission)
+        end
+      end
+
+      def destroy_existing_configuration(configuration)
+        existing_configuration = all.get(configuration[:name])
+        existing_configuration.destroy if existing_configuration
+      end
+
+      def authorize(group, permission)
+        range = (permission[:from_port]..permission[:to_port])
+        ip = transform_ip(permission[:incoming_ip]) if permission[:incoming_ip]
+        options = {
+          cidr_ip: ip,
+          group: permission[:group],
+          ip_protocol: permission[:ip_protocol]
+        }
+        group.authorize_port_range(range, compact_hash(options))
+      end
+
+      def compact_hash(to_compact)
+        to_compact.reject do |key|
+          to_compact[key].nil?
         end
       end
 

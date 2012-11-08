@@ -58,32 +58,67 @@ describe "Boucher Security Groups" do
       description: "group description",
       ip_permissions: [
         {
-          groups: [],
           from_port: 10,
           to_port: 11,
           protocol: "myprotocol",
-          incomingIPs: ["1.2.3.4.5"]
-        }
-      ]
-    }
-    fog_arguments = {
-      name: "group",
-      description: "group description",
-      ip_permissions: [
-        {
-          ipRanges: [{cidrIp: "1.2.3.4.5/32"}],
-          groups: [],
-          from_port: 10,
-          to_port: 11,
-          ipProtocol: "myprotocol",
+          incoming_ip: "1.2.3.4"
         }
       ]
     }
     security_groups = mock(get: nil)
-    new_group = mock
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    security_groups.should_receive(:new).with(fog_arguments).and_return(new_group)
-    new_group.should_receive(:save)
+    new_group = mock
+    expected_construction_args = {name: "group", description: "group description"}
+    security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
+    new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
+    Boucher::SecurityGroups.build_for_configuration(configuration)
+  end
+
+  it "creates a security group authorizing a different group" do
+    configuration = {
+      name: "group",
+      description: "group description",
+      ip_permissions: [
+        {
+          group: "zanzibar",
+          from_port: 10,
+          to_port: 11,
+        }
+      ]
+    }
+    security_groups = mock(get: nil)
+    Boucher.compute.stub(:security_groups).and_return(security_groups)
+    new_group = mock
+    security_groups.stub(:new).and_return(new_group)
+    new_group.should_receive(:authorize_port_range).with(10..11, group: "zanzibar")
+    Boucher::SecurityGroups.build_for_configuration(configuration)
+  end
+
+  it "creates a security group with multiple ip_permissions" do
+    configuration = {
+      name: "group",
+      description: "group description",
+      ip_permissions: [
+        {
+          from_port: 10,
+          to_port: 11,
+          incoming_ip: "1.2.3.4"
+        },
+        {
+          from_port: 90,
+          to_port: 91,
+          ip_protocol: "http",
+          incoming_ip: "5.6.7.8"
+        }
+      ]
+    }
+    security_groups = mock(get: nil)
+    Boucher.compute.stub(:security_groups).and_return(security_groups)
+    new_group = mock
+    expected_construction_args = {name: "group", description: "group description"}
+    security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
+    new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
+    new_group.should_receive(:authorize_port_range).with(90..91, cidr_ip: "5.6.7.8/32", ip_protocol: "http")
     Boucher::SecurityGroups.build_for_configuration(configuration)
   end
 
@@ -93,84 +128,40 @@ describe "Boucher Security Groups" do
       description: "group description",
       ip_permissions: [
         {
-          groups: [],
           from_port: 10,
           to_port: 11,
           protocol: "myprotocol",
-          incomingIPs: ["12345", "1999"]
-        }
-      ]
-    }
-    fog_arguments = {
-      name: "group",
-      description: "group description",
-      ip_permissions: [
-        {
-          ipRanges: [{cidrIp: "12345/32"}, {cidrIp: "1999/32"}],
-          groups: [],
-          from_port: 10,
-          to_port: 11,
-          ipProtocol: "myprotocol",
+          incomingIP: "1.2.3.4/32"
         }
       ]
     }
     configurations = [configuration, configuration, configuration]
-    transformed_configurations = [fog_arguments, fog_arguments, fog_arguments]
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
-    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
-    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
-    security_groups.should_receive(:new).with(fog_arguments).and_return(mock(save: nil))
+    security_groups.stub(:new).and_return(mock(authorize_port_range: nil))
+    security_groups.should_receive(:new).exactly(3).times
     Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
-  it "updates existing security groups and builds a new group for not-existing ones" do
+  it "destroys existing security groups and builds new ones over their graves" do
     groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
-    groups.stub(:get)
+    groups.stub(:new).and_return(stub(authorize_port_range: nil))
     groups.stub(:get).with("exists").and_return(groups.first)
     Boucher.compute.stub(:security_groups).and_return(groups)
-    non_colliding_configuration = {
-      name: "group",
-      description: "group description",
-      ip_permissions: [
-        {
-          groups: [],
-          from_port: 10,
-          to_port: 11,
-          protocol: "myprotocol",
-          incomingIPs: ["12345", "1999"]
-        }
-      ]
-    }
     colliding_configuration = {
       name: "exists",
       description: "group description",
       ip_permissions: [
         {
-          groups: [],
           from_port: 10,
           to_port: 11,
           protocol: "myprotocol",
-          incomingIPs: ["12345", "1999"]
+          incoming_ip: "1.2.3.4"
         }
       ]
     }
-    transformed_colliding_config = Boucher::SecurityGroups.transform_configuration colliding_configuration
-    transformed_non_collliding_config = Boucher::SecurityGroups.transform_configuration non_colliding_configuration
-
-    configurations = [non_colliding_configuration, colliding_configuration]
-
-    groups.first.should_receive(:merge_attributes)
-                .with(transformed_colliding_config)
-                .and_return(nil)
     groups.first.should_receive(:destroy)
-    groups.first.should_receive(:save)
-
-    groups.should_receive(:new)
-                .with(transformed_non_collliding_config)
-                .and_return(stub save: nil)
-
-    Boucher::SecurityGroups.build_for_configurations(configurations)
+    Boucher::SecurityGroups.build_for_configuration(colliding_configuration)
   end
 
   it "associates security groups and servers" do
