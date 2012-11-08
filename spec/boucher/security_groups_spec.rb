@@ -53,7 +53,7 @@ describe "Boucher Security Groups" do
   end
 
   it "creates a security group according to configuration" do
-    configuration = {
+    configurations = [{
       name: "group",
       description: "group description",
       ip_permissions: [
@@ -64,18 +64,18 @@ describe "Boucher Security Groups" do
           incoming_ip: "1.2.3.4"
         }
       ]
-    }
+    }]
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
     new_group = mock(save: nil)
     expected_construction_args = {name: "group", description: "group description"}
     security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
-    Boucher::SecurityGroups.build_for_configuration(configuration)
+    Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
   it "creates a security group authorizing a different group" do
-    configuration = {
+    configurations = [{
       name: "group",
       description: "group description",
       ip_permissions: [
@@ -85,17 +85,17 @@ describe "Boucher Security Groups" do
           to_port: 11,
         }
       ]
-    }
+    }]
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
     new_group = mock(save: nil)
     security_groups.stub(:new).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, group: "zanzibar")
-    Boucher::SecurityGroups.build_for_configuration(configuration)
+    Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
   it "creates a security group with multiple ip_permissions" do
-    configuration = {
+    configurations = [{
       name: "group",
       description: "group description",
       ip_permissions: [
@@ -111,7 +111,7 @@ describe "Boucher Security Groups" do
           incoming_ip: "5.6.7.8"
         }
       ]
-    }
+    }]
     security_groups = mock(get: nil)
     Boucher.compute.stub(:security_groups).and_return(security_groups)
     new_group = mock(save: nil)
@@ -119,7 +119,7 @@ describe "Boucher Security Groups" do
     security_groups.should_receive(:new).with(expected_construction_args).and_return(new_group)
     new_group.should_receive(:authorize_port_range).with(10..11, cidr_ip: "1.2.3.4/32")
     new_group.should_receive(:authorize_port_range).with(90..91, cidr_ip: "5.6.7.8/32", ip_protocol: "http")
-    Boucher::SecurityGroups.build_for_configuration(configuration)
+    Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
   it "Creates multiple security groups according to configurations" do
@@ -143,6 +143,8 @@ describe "Boucher Security Groups" do
     Boucher::SecurityGroups.build_for_configurations(configurations)
   end
 
+  xit "makes sure groups are all built before associating permissions"
+
   it "destroys existing security groups and builds new ones over their graves" do
     groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
     groups.stub(:new).and_return(stub(authorize_port_range: nil, save: nil))
@@ -164,15 +166,4 @@ describe "Boucher Security Groups" do
     Boucher::SecurityGroups.build_for_configuration(colliding_configuration)
   end
 
-  it "associates security groups and servers" do
-    server_security_group_mapping = {
-      "irc" => ["first"]
-    }
-    first_server = mock(tags: {"Name" => "irc"})
-    first_server.should_receive(:groups=).with(["first"])
-    second_server = mock(tags: {"Name" => "artisan"})
-    Boucher::Servers.stub(:all).and_return([first_server, second_server])
-
-    Boucher::SecurityGroups.associate_servers(server_security_group_mapping)
-  end
 end

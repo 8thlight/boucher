@@ -16,14 +16,5 @@ namespace :security_groups do
     groups = security_groups[:groups]
     Boucher::SecurityGroups.build_for_configurations(groups)
   end
-
-  desc "Associate servers and security groups"
-  task :associate do
-    security_group_file = File.open("config/security_groups.json", "r")
-    security_groups = JSON.parse(security_group_file.read)
-    binding.pry
-    mapping = security_groups["mapping"]
-    Boucher::SecurityGroups.associate_servers(mapping)
-  end
 end
 

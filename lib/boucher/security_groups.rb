@@ -44,10 +44,8 @@ module Boucher
           name: configuration[:name],
           description: configuration[:description]
         )
-
-        configuration[:ip_permissions].each do |permission|
-          authorize(group, permission)
-        end
+        group.save
+        group
       end
 
       def destroy_existing_configuration(configuration)
@@ -63,7 +61,6 @@ module Boucher
           group: permission[:group],
           ip_protocol: permission[:ip_protocol]
         }
-        group.save
         group.authorize_port_range(range, compact_hash(options))
       end
 
@@ -74,8 +71,17 @@ module Boucher
       end
 
       def build_for_configurations(configurations)
+        groups = {}
         configurations.each do |configuration|
-          build_for_configuration(configuration)
+          groups[configuration] = build_for_configuration(configuration)
+        end
+
+
+
+        groups.each do |configuration, group|
+          configuration[:ip_permissions].each do |permission|
+            authorize(group, permission)
+          end
         end
       end
 
@@ -86,14 +92,12 @@ module Boucher
         end
       end
 
-      def associate_servers(server_mapping)
-        servers = Boucher::Servers.all
-        servers.each do |s|
-          groups = server_mapping[s.tags["Name"]]
-          if groups
-            s.groups = groups
-          end
-        end
+      def groups_for_server
+        security_group_file = File.open("config/security_groups.json", "r")
+        security_groups = JSON.parse(security_group_file.read)
+        binding.pry
+        mapping = security_groups["mapping"]
+        Boucher::SecurityGroups.associate_servers(mapping)
       end
     end
   end
