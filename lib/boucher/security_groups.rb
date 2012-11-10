@@ -76,8 +76,6 @@ module Boucher
           groups[configuration] = build_for_configuration(configuration)
         end
 
-
-
         groups.each do |configuration, group|
           configuration[:ip_permissions].each do |permission|
             authorize(group, permission)
@@ -92,12 +90,11 @@ module Boucher
         end
       end
 
-      def groups_for_server
+      def groups_for_server(name)
         security_group_file = File.open("config/security_groups.json", "r")
         security_groups = JSON.parse(security_group_file.read)
-        binding.pry
         mapping = security_groups["mapping"]
-        Boucher::SecurityGroups.associate_servers(mapping)
+        mapping[name]
       end
     end
   end

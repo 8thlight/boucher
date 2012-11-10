@@ -49,20 +49,6 @@ describe "Boucher Provisioning" do
       Boucher.provision :name => "some_meal"
     end
 
-    it "provisions a server with a security group" do
-      Boucher::SecurityGroups.stub(:groups_for_server).and_return(["group"])
-      Boucher.stub!(:ssh)
-      Boucher.stub(:setup_meal)
-      Boucher.stub(:cook_meal)
-      servers = mock(:servers)
-      Boucher.compute.stub(servers: servers)
-      server = Fog::Compute::AWS::Server.new(tags: {})
-      server.stub(save: nil, wait_for: nil)
-      servers.should_receive(:new).with(hash_including(groups: ["group"])).and_return(server)
-
-      Boucher.provision :name => "some_meal"
-    end
-
     it "provisions a server with elastic IP" do
       Boucher.compute.key_pairs.create(name: "test_key")
       ip = Boucher.compute.addresses.create
