@@ -89,13 +89,6 @@ module Boucher
           memo
         end
       end
-
-      def groups_for_server(name)
-        security_group_file = File.open("config/security_groups.json", "r")
-        security_groups = JSON.parse(security_group_file.read)
-        mapping = security_groups["mapping"]
-        mapping[name]
-      end
     end
   end
 end
