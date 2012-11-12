@@ -4,7 +4,8 @@ require 'boucher/servers'
 module Boucher
   module SecurityGroups
     SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-50s\n"
-    RULE_TABLE_FORMAT = "%-18s  %-19s  %-10s %-10s %-10s\n"
+    RULE_WIDTH = 18
+    RULE_TABLE_FORMAT = "%-#{RULE_WIDTH}s  %-19s  %-10s %-10s %-10s\n"
 
     module Printing
       def self.print_table(security_groups, servers_for_groups)
@@ -28,7 +29,7 @@ module Boucher
       end
       def self.rule_groups(ip_permissions)
         names = ip_permissions["groups"].map do |group|
-          group["groupName"]
+          group["groupName"].ljust(RULE_WIDTH)
         end
         if names.empty?
           "______"
