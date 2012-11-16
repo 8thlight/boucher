@@ -9,6 +9,12 @@ namespace :security_groups do
     Boucher::SecurityGroups::Printing.print_table(security_groups, servers_for_groups)
   end
 
+  task :simple_list do
+    security_groups = Boucher::SecurityGroups.all
+    servers_for_groups = Boucher::SecurityGroups.servers_for_groups
+    Boucher::SecurityGroups::Printing.print_simple_table(security_groups, servers_for_groups)
+  end
+
   desc "Create security groups"
   task :build_all do
     security_group_file = File.open("config/security_groups.json", "r")

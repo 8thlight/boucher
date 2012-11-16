@@ -3,20 +3,24 @@ require 'boucher/servers'
 
 module Boucher
   module SecurityGroups
-    SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-50s\n"
-    RULE_WIDTH = 18
-    RULE_TABLE_FORMAT = "%-#{RULE_WIDTH}s  %-19s  %-10s %-10s %-10s\n"
-
     module Printing
+      SECURITY_GROUP_TABLE_FORMAT = "%-12s  %-12s  %-50s\n"
+      RULE_WIDTH = 18
+      RULE_TABLE_FORMAT = "%-#{RULE_WIDTH}s  %-19s  %-10s %-10s %-10s\n"
+
+      def self.print_group_summary(security_group, servers_for_groups)
+        printf SECURITY_GROUP_TABLE_FORMAT,
+          security_group.group_id,
+          security_group.name,
+          server_names(servers_for_groups[security_group.name])
+      end
+
       def self.print_table(security_groups, servers_for_groups)
         puts "----------------------------------------------------------------------"
         security_groups.each do |security_group|
           puts "GROUP:"
           printf SECURITY_GROUP_TABLE_FORMAT, "ID", "Name", "Servers"
-          printf SECURITY_GROUP_TABLE_FORMAT,
-            security_group.group_id,
-            security_group.name,
-            server_names(servers_for_groups[security_group.name])
+          print_group_summary(security_group, servers_for_groups)
           puts "\n"
           puts "RULES FOR GROUP:"
           printf RULE_TABLE_FORMAT, "Incoming Groups", "Incoming IP", "Protocol", "Min Port", "Max Port"
@@ -27,6 +31,14 @@ module Boucher
           puts "\n"
         end
       end
+
+      def self.print_simple_table(security_groups, servers_for_groups)
+        printf SECURITY_GROUP_TABLE_FORMAT, "ID", "Name", "Servers"
+        security_groups.each do |security_group|
+          print_group_summary(security_group, servers_for_groups)
+        end
+      end
+
       def self.rule_groups(ip_permissions)
         names = ip_permissions["groups"].map do |group|
           group["groupName"].ljust(RULE_WIDTH)
