@@ -65,6 +65,30 @@ module Boucher
       end
     end
 
+    class SecurityGroup
+      def initialize(group_hash)
+        @group_hash = group_hash
+      end
+
+      def group
+        (@group_hash["groups"].first || {})["groupName"]
+      end
+
+      def ip
+        ip_ranges = @group_hash["ipRanges"]
+        ip = ip_ranges.first || {}
+        ip["cidrIp"]
+      end
+
+      def ip_protocol
+        @group_hash["ipProtocol"]
+      end
+
+      def range
+        (@group_hash["fromPort"]..@group_hash["toPort"])
+      end
+    end
+
     class << self
       def all
         Boucher.compute.security_groups
@@ -80,18 +104,36 @@ module Boucher
       end
 
       def build_for_configuration(configuration)
-        destroy_existing_configuration(configuration)
-        group = all.new(
-          name: configuration[:name],
-          description: configuration[:description]
-        )
-        group.save
-        group
+        existing_group = all.get(configuration[:name])
+        if existing_group
+          clear_security_group(existing_group)
+          existing_group
+        else
+          group = all.new(
+            name: configuration[:name],
+            description: configuration[:description]
+          )
+          group.save
+          group
+        end
       end
 
-      def destroy_existing_configuration(configuration)
-        existing_configuration = all.get(configuration[:name])
-        existing_configuration.destroy if existing_configuration
+      def clear_security_group(existing_group)
+        existing_group.ip_permissions.each do |permission|
+          group = SecurityGroup.new(permission)
+          range = group.range
+          options = options_for(group)
+          existing_group.revoke_port_range(range, options)
+        end
+      end
+
+      def options_for(group)
+        raw_options = {
+          ip_protocol: group.ip_protocol,
+          cidr_ip: group.ip,
+          group: group.group
+        }
+        compact_hash(raw_options)
       end
 
       def authorize(group, permission)

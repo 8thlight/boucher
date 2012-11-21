@@ -148,24 +148,37 @@ describe "Boucher Security Groups" do
 
   xit "makes sure groups are all built before associating permissions"
 
-  it "destroys existing security groups and builds new ones over their graves" do
-    groups = [Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")]
-    groups.stub(:new).and_return(stub(authorize_port_range: nil, save: nil))
+  it "purges rules from existing security groups" do
+    group = Fog::Compute::AWS::SecurityGroup.new("name"=>"exists")
+    ip_permissions =  [
+      {
+        "fromPort" => 10,
+        "toPort" => 11,
+        "ipProtocol" => "myprotocol",
+        "groups" => [],
+        "ipRanges" => [{"cidrIp" => "1.2.3.4/32"}]
+      },
+      {
+        "fromPort" => 12,
+        "toPort" => 13,
+        "groups" => [{"groupName" => "zanzibar"}],
+        "ipRanges" => []
+      }
+    ]
+    group.stub(ip_permissions: ip_permissions)
+    groups = [group]
     groups.stub(:get).with("exists").and_return(groups.first)
     Boucher.compute.stub(:security_groups).and_return(groups)
     colliding_configuration = {
       name: "exists",
       description: "group description",
       ip_permissions: [
-        {
-          from_port: 10,
-          to_port: 11,
-          protocol: "myprotocol",
-          incoming_ip: "1.2.3.4"
-        }
+        { }
       ]
     }
-    groups.first.should_receive(:destroy)
+    groups.first.should_receive(:revoke_port_range).with(10..11, {cidr_ip: "1.2.3.4/32", ip_protocol: "myprotocol"})
+    groups.first.stub(:revoke_port_range)
+    groups.first.should_receive(:revoke_port_range).with(12..13, {group: "zanzibar"})
     Boucher::SecurityGroups.build_for_configuration(colliding_configuration)
   end
 
