@@ -17,8 +17,8 @@ namespace :security_groups do
 
   desc "Create security groups"
   task :build_all do
-    security_group_file = File.open("config/security_groups.json", "r")
-    security_groups = JSON.parse(security_group_file.read, symbolize_names: true)
+    security_group_file = File.open("config/security_groups.yml", "r")
+    security_groups = YAML.load(security_group_file.read)
     groups = security_groups[:groups]
     Boucher::SecurityGroups.build_for_configurations(groups)
   end
