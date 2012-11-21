@@ -68,7 +68,7 @@ You will also need to create a security groups yaml file in order to use the sec
 
 7) Delete the ubuntu user.
 
-    deluser ubuntu
+    sudo deluser ubuntu
 
 8) Enable sudo without typing password
 
