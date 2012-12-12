@@ -148,15 +148,15 @@ are a hash describing the volume.  There are really three variations:
 
 1) Mounting an existing volume by using the volume_id:
 
-    "volumes": {"/dev/sda3" => {"volume_id": "volume-abc123"}}
+    "volumes": {"/dev/sda3": {"volume_id": "volume-abc123"}}
 
 2) Mount a new volume based on an existing snapshot:
 
-    "volumes": {"/dev/sda4" => {"snapshot_id": "snapshot-abc123"}}
+    "volumes": {"/dev/sda4": {"snapshot_id": "snapshot-abc123"}}
 
 3) Mount a new volume of a given size:
 
-    "volumes": {"/dev/sda5" => {"size": 16}}
+    "volumes": {"/dev/sda5": {"size": 16}}
 
 If volumes are not specified, AWS will apply the default volume setup in the management console.
 
