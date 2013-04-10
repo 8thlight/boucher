@@ -28,7 +28,14 @@ module Boucher
       command_arg = "\"#{command}\""
     end
 
-    command = "#{ssh_command} #{Boucher::Config[:username]}@#{server.dns_name} #{command_arg}"
+    meal = {}
+    meal_name = server.tags["Meal"]
+    if meal_name
+      meal = Boucher.meal(meal_name)
+    end
+    username = meal[:username] || Boucher::Config[:username]
+
+    command = "#{ssh_command} #{username}@#{server.dns_name} #{command_arg}"
     verbose command
     Kernel.system command
     raise "command failed with code #{$?.exitstatus}" unless $?.success?

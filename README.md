@@ -121,6 +121,7 @@ allows you to add extra configuration information under the "Boucher": key.  For
         "base_image_id": "ami-abcd1234", // overides :default_image_id config
         "flavor_id": "t1.micro", // overides :default_flavor_id config
         "groups": ["SSH"], // overides :default_groups config
+        "username": "ec2-user", // overides :username config
         "key_name": ["some_key"], // overides :aws_key_filename config
         "elastic_ips": ["1.2.3.4"], // a list of elastic IPs that'll be attached to the server.  Elastic IP's acquired via AWS management console.
         "volumes": {"/dev/sda2": <volume spec>} // See Volume Specs below
