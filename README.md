@@ -118,7 +118,7 @@ allows you to add extra configuration information under the "Boucher": key.  For
         ],
 
       "boucher": {
-        "base_image_id": "ami-abcd1234", // overides :default_image_id config
+        "image_id": "ami-abcd1234", // overides :default_image_id config
         "flavor_id": "t1.micro", // overides :default_flavor_id config
         "groups": ["SSH"], // overides :default_groups config
         "username": "ec2-user", // overides :username config
