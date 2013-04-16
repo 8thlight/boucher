@@ -77,10 +77,10 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   end
 
   desc "Open an SSH session with the specified server"
-  task :ssh, [:server_id] do |t, args|
-    puts "Opening SSH session to #{args.server_id}"
+  task :ssh, [:server_id, :command] do |t, args|
+    args.with_defaults(:command => nil)
     server = Boucher.compute.servers.get(args.server_id)
-    Boucher.ssh server
+    Boucher.ssh server, args.command
   end
 
   desc "Download a file from the server"
