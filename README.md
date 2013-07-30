@@ -76,12 +76,13 @@ You will also need to create a security groups yaml file in order to use the sec
     # add the following line at the end of the file:
     <username> ALL=(ALL) NOPASSWD: ALL
 
-9) Install required packages and gems.
+9) Install required packages and gems (note, not yet compatible with Chef 11+)
 
     sudo apt-get update
     sudo apt-get install ruby1.9.1 ruby1.9.1-dev git gcc make libxml2-dev libxslt1-dev
     sudo apt-get upgrade
-    sudo gem install bundler chef
+    sudo gem install bundler
+    sudo gem install chef -v 10.26.0
 
 10) Checkout your infrastructure repo.  (Yes.  You should push your repo even in this early stage.)
 If you use github, you'll have to generate ssh keys and add them to the github repo. Note: be sure
