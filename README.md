@@ -15,13 +15,13 @@ It also helps manage your system with support for different environments and tas
 
 ## Getting Started
 
-Getting up and running with Boucher might take a little while depending your your familiarity with AWS and Linux.
+Getting up and running with Boucher might take a little while depending on your familiarity with AWS and Linux.
 Once you're up and running though, it'll save you countless hours in the long run.
 
 ### Creating your infrastructure project.
 
 Boucher assumes a certain directory structure.  Bummer I know, but c'est la vie.  To help you out, we've provided a git repo
-that'll get you off the ground.  We recomend
+that'll get you off the ground.  We recommend
 
     git clone git://github.com/8thlight/boucher_template.git infrastructure
     rm -rf infrastructure/.git
