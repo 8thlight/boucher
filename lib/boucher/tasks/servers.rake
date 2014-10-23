@@ -77,9 +77,10 @@ web console and click Instance Actions -> Change Termination Protection -> Yes."
   end
 
   desc "Open an SSH session with the specified server"
-  task :ssh, [:server_id, :command] do |t, args|
+  task :ssh, [:id_or_meal, :command] do |t, args|
+    server_id = Boucher.resolve_servers(args.id_or_meal).first.id
     args.with_defaults(:command => nil)
-    server = Boucher.compute.servers.get(args.server_id)
+    server = Boucher.compute.servers.get(server_id)
     Boucher.ssh server, args.command
   end
 
