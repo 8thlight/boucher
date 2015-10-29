@@ -17,7 +17,6 @@ Boucher.force_env!("dev")
 Fog.mock!
 Boucher::IO.mock!
 
-
 # MDM - Monkey patch wait_for methods so the tests are FASTER!
 # Unfortunately, Fog mocks depends on real time delays :.-(
 #module Fog

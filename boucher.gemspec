@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency('rake', '>= 0.9.2.2')
-  s.add_dependency('fog', '>= 1.6.0')
+  s.add_dependency('fog', '>= 1.27.0')
   s.add_dependency('retryable', '>= 1.3.1')
   s.add_dependency('pry', '>= 0.9.10')
 end
