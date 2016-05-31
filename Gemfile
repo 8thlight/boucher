@@ -1,6 +1,6 @@
 source 'https://rubygems.org/'
 
-gem 'fog'
+gem 'fog', '~> 1.38.0'
 gem 'pry'
 gem 'rake'
 gem 'retryable'
