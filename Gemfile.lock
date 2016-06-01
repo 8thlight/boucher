@@ -138,6 +138,7 @@ GEM
     inflecto (0.0.2)
     ipaddress (0.8.3)
     method_source (0.8.2)
+    mime-types (2.99.2)
     mini_portile2 (2.0.0)
     multi_json (1.12.1)
     nokogiri (1.6.7.2)
@@ -169,6 +170,7 @@ PLATFORMS
 
 DEPENDENCIES
   fog (~> 1.38.0)
+  mime-types (~> 2.99)
   pry
   rake
   retryable
